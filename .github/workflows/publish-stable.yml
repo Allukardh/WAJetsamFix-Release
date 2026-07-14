@@ -1,16 +1,19 @@
 name: Publish WAJetsamFix stable package
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/publish-stable.yml
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   publish:
+    if: >-
+      github.event.issue.number == 1 &&
+      github.event.comment.body == '/publish-0.7.1' &&
+      github.event.comment.user.login == github.repository_owner
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -19,6 +22,11 @@ jobs:
       EXPECTED_SHA256: 17670a96b751ef7f94979e399774931b53511b53c4687b1a5d6d48ab7d7ac115
       SOURCE_URL: https://github.com/Allukardh/WAJetsamFix/releases/download/v0.7.1/com.allukardh.wajetsamfix_0.7.1_iphoneos-arm64.deb
     steps:
+      - name: Check out distribution repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
       - name: Download and audit package
         shell: bash
         run: |
@@ -131,5 +139,12 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add RELEASE_VERIFICATION.md
-          git commit -m "Record stable release verification"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "Record stable release verification"
+            git push
+          fi
+          gh pr comment 1 --repo "$REPO" --body "WAJetsamFix 0.7.1 was published to the public distribution repository and independently re-downloaded with the expected SHA-256. The Release contains exactly one audited package."
+
+      - name: Report failure
+        if: failure()
+        run: gh pr comment 1 --repo "$REPO" --body "The WAJetsamFix 0.7.1 public Release publication failed. The source repository and its stable Release were not changed."
