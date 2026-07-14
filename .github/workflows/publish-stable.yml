@@ -1,0 +1,118 @@
+name: Publish WAJetsamFix stable package
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  publish:
+    if: >-
+      github.event.issue.number == 2 &&
+      github.event.comment.body == '/publish-0.7.1' &&
+      github.event.comment.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PACKAGE: com.allukardh.wajetsamfix_0.7.1_iphoneos-arm64.deb
+      EXPECTED_SHA256: 17670a96b751ef7f94979e399774931b53511b53c4687b1a5d6d48ab7d7ac115
+      SOURCE_URL: https://github.com/Allukardh/WAJetsamFix/releases/download/v0.7.1/com.allukardh.wajetsamfix_0.7.1_iphoneos-arm64.deb
+    steps:
+      - name: Download and audit package
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --output "$PACKAGE" "$SOURCE_URL"
+          test "$(sha256sum "$PACKAGE" | awk '{print $1}')" = "$EXPECTED_SHA256"
+          test "$(dpkg-deb -f "$PACKAGE" Package)" = "com.allukardh.wajetsamfix"
+          test "$(dpkg-deb -f "$PACKAGE" Name)" = "WAJetsamFix"
+          test "$(dpkg-deb -f "$PACKAGE" Version)" = "0.7.1"
+          test "$(dpkg-deb -f "$PACKAGE" Architecture)" = "iphoneos-arm64"
+          test "$(dpkg-deb -f "$PACKAGE" Maintainer)" = "Allukardh"
+          test "$(dpkg-deb -f "$PACKAGE" Author)" = "Allukardh"
+          DESCRIPTION="$(dpkg-deb -f "$PACKAGE" Description)"
+          grep -Fq 'Targeted Jetsam protection for WhatsApp notifications' <<<"$DESCRIPTION"
+          grep -Fq 'original 24 MB memory limit' <<<"$DESCRIPTION"
+          grep -Fq 'changes only that exact target to 40 MB' <<<"$DESCRIPTION"
+          grep -Fq 'no polling daemon' <<<"$DESCRIPTION"
+          grep -Fq 'Personal project provided as-is' <<<"$DESCRIPTION"
+
+      - name: Prepare release notes
+        shell: bash
+        run: |
+          cat > /tmp/release.md <<'EOF'
+          Stable source-side Jetsam protection for WhatsApp's notification `ServiceExtension` on Dopamine 2 RootHide.
+
+          ## What it changes
+
+          - validates the exact WhatsApp notification ServiceExtension target;
+          - changes only an exact 24 MB candidate to 40 MB;
+          - leaves unrelated processes, commands and memory values untouched;
+          - performs no global Jetsam modification.
+
+          ## Runtime design
+
+          - source-side interception inside `runningboardd`;
+          - candidate-first hot path;
+          - ABI-safe handling of malformed and unknown requests;
+          - no polling daemon, periodic scan, timer, fallback enforcement or repair loop;
+          - event-driven local diagnostics;
+          - non-resident `wajetsamfixctl status` command.
+
+          ## Final validation
+
+          - 1,003 successful rewrites from 1,003 attempts;
+          - zero rewrite failures;
+          - zero compatibility warnings;
+          - normal first-message, sequential and burst delivery;
+          - no observed delay or single-tick episode;
+          - approximately 0.0% diagnostics-bridge CPU.
+
+          ## Fully validated environment
+
+          - iPhone 14 Pro Max;
+          - iOS 16.4.1;
+          - Dopamine 2 RootHide 2.4.9.25;
+          - WhatsApp 26.26.73.
+
+          Wider iOS and architecture ranges are package build targets, not a guarantee of validation on every device or future WhatsApp version.
+
+          ## SHA-256
+
+          ```text
+          17670a96b751ef7f94979e399774931b53511b53c4687b1a5d6d48ab7d7ac115
+          ```
+
+          WAJetsamFix is a personal project provided as-is, without guaranteed individual support or future updates.
+          EOF
+
+      - name: Publish stable release
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v0.7.1 --repo "$REPO" >/dev/null 2>&1; then
+            gh release edit v0.7.1 --repo "$REPO" --title "WAJetsamFix 0.7.1" --notes-file /tmp/release.md --latest
+            gh release upload v0.7.1 "$PACKAGE" --repo "$REPO" --clobber
+          else
+            gh release create v0.7.1 "$PACKAGE" --repo "$REPO" --target main --title "WAJetsamFix 0.7.1" --notes-file /tmp/release.md --latest
+          fi
+
+      - name: Verify published asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$REPO/releases/latest" --jq .tag_name)" = "v0.7.1"
+          test "$(gh release view v0.7.1 --repo "$REPO" --json assets --jq '.assets | length')" = "1"
+          test "$(gh release view v0.7.1 --repo "$REPO" --json assets --jq '.assets[0].name')" = "$PACKAGE"
+          mkdir /tmp/verify
+          gh release download v0.7.1 --repo "$REPO" --pattern "$PACKAGE" --dir /tmp/verify
+          test "$(sha256sum "/tmp/verify/$PACKAGE" | awk '{print $1}')" = "$EXPECTED_SHA256"
+          gh issue comment 2 --repo "$REPO" --body "WAJetsamFix 0.7.1 was published and independently re-downloaded with the expected SHA-256. The public Release contains exactly one audited package."
+
+      - name: Report failure
+        if: failure()
+        run: gh issue comment 2 --repo "$REPO" --body "The WAJetsamFix 0.7.1 public Release publication failed. The source repository and its stable Release were not changed."
