@@ -1,0 +1,1 @@
+17670a96b751ef7f94979e399774931b53511b53c4687b1a5d6d48ab7d7ac115  com.allukardh.wajetsamfix_0.7.1_iphoneos-arm64.deb
