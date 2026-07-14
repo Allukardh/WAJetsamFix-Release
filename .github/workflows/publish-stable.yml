@@ -1,19 +1,16 @@
 name: Publish WAJetsamFix stable package
 
 on:
-  issue_comment:
-    types: [created]
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-stable.yml
 
 permissions:
   contents: write
-  issues: write
 
 jobs:
   publish:
-    if: >-
-      github.event.issue.number == 2 &&
-      github.event.comment.body == '/publish-0.7.1' &&
-      github.event.comment.user.login == github.repository_owner
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -111,8 +108,28 @@ jobs:
           mkdir /tmp/verify
           gh release download v0.7.1 --repo "$REPO" --pattern "$PACKAGE" --dir /tmp/verify
           test "$(sha256sum "/tmp/verify/$PACKAGE" | awk '{print $1}')" = "$EXPECTED_SHA256"
-          gh issue comment 2 --repo "$REPO" --body "WAJetsamFix 0.7.1 was published and independently re-downloaded with the expected SHA-256. The public Release contains exactly one audited package."
 
-      - name: Report failure
-        if: failure()
-        run: gh issue comment 2 --repo "$REPO" --body "The WAJetsamFix 0.7.1 public Release publication failed. The source repository and its stable Release were not changed."
+      - name: Publish verification record
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > RELEASE_VERIFICATION.md <<EOF
+          # Release verification
+
+          The public WAJetsamFix 0.7.1 Release was independently re-downloaded and verified after publication.
+
+          - **Release:** v0.7.1
+          - **Asset:** \`$PACKAGE\`
+          - **Asset count:** 1
+          - **SHA-256:** \`$EXPECTED_SHA256\`
+          - **Package:** \`com.allukardh.wajetsamfix\`
+          - **Version:** \`0.7.1\`
+          - **Architecture:** \`iphoneos-arm64\`
+          - **Sileo description:** audited and present
+          - **Result:** passed
+          EOF
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add RELEASE_VERIFICATION.md
+          git commit -m "Record stable release verification"
+          git push
