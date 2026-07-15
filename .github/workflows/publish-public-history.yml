@@ -1,0 +1,469 @@
+name: Publish WAJetsamFix public history
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-public-history.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Publish and verify release history
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          REPO="$GITHUB_REPOSITORY"
+          TARGET_SHA="$(git rev-parse HEAD^)"
+          PACKAGE="com.allukardh.wajetsamfix_0.7.1_iphoneos-arm64.deb"
+          EXPECTED_SHA256="17670a96b751ef7f94979e399774931b53511b53c4687b1a5d6d48ab7d7ac115"
+
+          mkdir -p /tmp/current /tmp/notes
+
+          gh release download v0.7.1 --repo "$REPO" --pattern "$PACKAGE" --dir /tmp/current
+          test "$(sha256sum "/tmp/current/$PACKAGE" | awk '{print $1}')" = "$EXPECTED_SHA256"
+          test "$(dpkg-deb -f "/tmp/current/$PACKAGE" Package)" = "com.allukardh.wajetsamfix"
+          test "$(dpkg-deb -f "/tmp/current/$PACKAGE" Version)" = "0.7.1"
+          test "$(dpkg-deb -f "/tmp/current/$PACKAGE" Architecture)" = "iphoneos-arm64"
+
+          recreate_release() {
+            local tag="$1"
+            local title="$2"
+            local prerelease="$3"
+            local notes="$4"
+
+            if gh release view "$tag" --repo "$REPO" >/dev/null 2>&1; then
+              gh release delete "$tag" --repo "$REPO" --yes
+            fi
+
+            git tag -f "$tag" "$TARGET_SHA"
+            git push --force origin "refs/tags/$tag"
+
+            if [ "$prerelease" = "true" ]; then
+              gh release create "$tag" --repo "$REPO" --verify-tag --title "$title" --notes-file "$notes" --prerelease
+            else
+              gh release create "$tag" --repo "$REPO" --verify-tag --title "$title" --notes-file "$notes"
+            fi
+
+            sleep 1
+          }
+
+          cat > /tmp/notes/01-v0.1.0.md <<'EOF_01'
+          ## Overview
+
+          Initial experimental baseline for the WAJetsamFix investigation.
+
+          ## Evolution
+
+          - introduced the first rootless client and privileged-process design;
+          - confirmed that the privileged component could start;
+          - showed that the client connection did not complete;
+          - no memory-limit change reached the WhatsApp notification target.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_01
+
+          cat > /tmp/notes/02-v0.2.0.md <<'EOF_02'
+          ## Overview
+
+          First version to prove that targeted memory-limit enforcement could restore WhatsApp notification delivery.
+
+          ## Evolution
+
+          - replaced the unsuccessful injected-client design with a standalone root process;
+          - added direct discovery of the exact WhatsApp notification `ServiceExtension`;
+          - applied targeted 32 MB enforcement;
+          - confirmed the central memory-limit hypothesis;
+          - demonstrated that fixed rapid polling was too expensive for long-term use.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_02
+
+          cat > /tmp/notes/03-v0.3.0.md <<'EOF_03'
+          ## Overview
+
+          Reduced global work by following the active target process instead of scanning continuously.
+
+          ## Evolution
+
+          - introduced adaptive target-process enforcement;
+          - restored 32 MB when iOS returned the target to 24 MB;
+          - reduced unnecessary global activity;
+          - greatly improved delivery reliability;
+          - an occasional single-tick episode still remained.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_03
+
+          cat > /tmp/notes/04-v0.4.0.md <<'EOF_04'
+          ## Overview
+
+          Established that 40 MB provided the required headroom for the affected environment.
+
+          ## Evolution
+
+          - raised the target active and inactive limits from 32 MB to 40 MB;
+          - added focused lifecycle and resource diagnostics;
+          - confirmed that the original 24 MB ceiling was insufficient;
+          - delivered reliable notifications;
+          - continuous diagnostics and polling remained too expensive for a final runtime.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_04
+
+          cat > /tmp/notes/05-v0.4.1.md <<'EOF_05'
+          ## Overview
+
+          Stable polling-based compatibility baseline for the tested environment.
+
+          ## Evolution
+
+          - removed continuous metrics and repeated identity checks;
+          - retained rapid targeted enforcement and event-driven exit tracking;
+          - recorded 164 successful applications or corrections with zero failures over approximately 53 minutes;
+          - delivered reliable notifications;
+          - visible resident CPU use remained because polling was still required.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_05
+
+          cat > /tmp/notes/06-v0.5.0.md <<'EOF_06'
+          ## Overview
+
+          First filtered source-side interception experiment.
+
+          ## Evolution
+
+          - introduced a source-side path while preserving the proven compatibility baseline;
+          - kept the working fallback active until source ownership could be demonstrated;
+          - no source-side rewrite was confirmed;
+          - revealed that a working compatibility layer could conceal an inactive experimental path.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_06
+
+          cat > /tmp/notes/07-v0.5.1.md <<'EOF_07'
+          ## Overview
+
+          Added event-driven diagnostics that exposed why the first source-side attempt was not active.
+
+          ## Evolution
+
+          - replaced sandbox-dependent diagnostic writes with event-driven state delivery;
+          - added a lightweight root diagnostics bridge;
+          - confirmed that ordinary tweak loading did not place the source hook inside `runningboardd`;
+          - preserved working notifications during the investigation;
+          - produced the evidence required for the later PatchLoader architecture.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_07
+
+          cat > /tmp/notes/08-v0.6.0.md <<'EOF_08'
+          ## Overview
+
+          Introduced the source-side architecture that ultimately replaced polling enforcement.
+
+          ## Evolution
+
+          - integrated RootHide PatchLoader for early loading inside `runningboardd`;
+          - added dynamic jailbreak-root discovery and Safe Mode checks;
+          - proved that the source-side path corrected the exact target before the temporary compatibility path reacted;
+          - validated 32 source-side rewrites;
+          - established the foundation of the final architecture.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_08
+
+          cat > /tmp/notes/09-v0.6.1.md <<'EOF_09'
+          ## Overview
+
+          Removed polling enforcement after source-side ownership was proven.
+
+          ## Evolution
+
+          - removed the polling daemon, watchdog and recurring repair loops;
+          - retained only early loading, the source hook and event-driven diagnostics;
+          - validated more than 30 messages with zero loss, delay or single-tick episodes;
+          - confirmed 25 exact-target rewrites;
+          - measured approximately 0.0% diagnostics-bridge CPU.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_09
+
+          cat > /tmp/notes/10-v0.6.2.md <<'EOF_10'
+          ## Overview
+
+          Final stable release of the original pure source-side candidate-first design.
+
+          ## Evolution
+
+          - corrected diagnostics across `runningboardd` restarts and source lifecycles;
+          - tied readiness and counters to the active source process;
+          - preserved the exact WhatsApp notification-extension target and 24 MB → 40 MB policy;
+          - removed obsolete polling-era files from the active tree;
+          - became the proven fallback baseline for the 0.7 development line.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_10
+
+          cat > /tmp/notes/11-v0.7.0-alpha1.md <<'EOF_11'
+          ## Overview
+
+          First 0.7 hardening milestone built on the proven 0.6.2 source-side architecture.
+
+          ## Evolution
+
+          - introduced explicit early-loader and source-hook states;
+          - prevented false-positive hook-install reporting;
+          - added safer request handling and sparse compatibility diagnostics;
+          - added the non-resident status command;
+          - hardened and bounded the local runtime log;
+          - reduced resident dependencies and background relaunch behavior;
+          - completed more than 300 successful rewrites with zero failures and zero warnings.
+
+          ## Status
+
+          Historical pre-release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_11
+
+          cat > /tmp/notes/12-v0.7.0-alpha2.md <<'EOF_12'
+          ## Overview
+
+          Corrected diagnostic state across new `runningboardd` lifecycles.
+
+          ## Evolution
+
+          - cleared hook, rewrite, failure and compatibility state for each new source lifecycle;
+          - required current-process state before reporting confirmed protection;
+          - validated two consecutive source-process changes;
+          - confirmed clean zero counters before the first new matching request;
+          - recorded 16 successful rewrites from 16 attempts with zero failures and zero warnings;
+          - measured approximately 0.0% idle CPU.
+
+          ## Status
+
+          Historical pre-release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_12
+
+          cat > /tmp/notes/13-v0.7.0-rc1.md <<'EOF_13'
+          ## Overview
+
+          Release candidate that completed lifecycle, recovery and installation validation for the 0.7 hardening line.
+
+          ## Evolution
+
+          - validated direct upgrade from Alpha 2;
+          - validated Safe Mode prevention and normal recovery;
+          - validated complete uninstall and clean reinstall;
+          - completed a mixed-notification gate exceeding 50 rewrites;
+          - recorded zero rewrite failures and zero unexpected warnings;
+          - observed no notification loss, delay or single-tick episode during the gate.
+
+          ## Status
+
+          Historical pre-release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_13
+
+          cat > /tmp/notes/14-v0.7.0.md <<'EOF_14'
+          ## Overview
+
+          Introduced the complete 0.7 diagnostics and runtime-hardening foundation.
+
+          ## Evolution
+
+          - consolidated runtime and diagnostic state handling;
+          - made hook-install reporting authoritative;
+          - added safer request validation and independently testable policy behavior;
+          - corrected state across `runningboardd` lifecycle changes;
+          - added protected rotating diagnostics and the non-resident status command;
+          - removed unnecessary relaunch behavior and resident dependencies;
+          - expanded automated policy tests and package auditing.
+
+          ## Why it was superseded
+
+          Post-release architectural review found that a bounded compatibility inspection path performed avoidable synchronous work outside the exact 24 MB candidate flow. No deterministic failure was proven, but the behavior was unnecessary for the supported scope and was removed in 0.7.1.
+
+          ## Status
+
+          Historical release, superseded by WAJetsamFix 0.7.1. No historical package is distributed from this entry.
+          EOF_14
+
+          cat > /tmp/notes/15-v0.7.1-rc1.md <<'EOF_15'
+          ## Overview
+
+          Conservative correction that retained the 0.7 hardening while restoring the minimal candidate-first runtime.
+
+          ## Evolution
+
+          - removed the unnecessary broad compatibility inspection retained by 0.7.0;
+          - returned non-24 MB requests directly to iOS before target-path validation;
+          - preserved safe handling of malformed, unrelated and unknown requests;
+          - retained the complete diagnostics and lifecycle-hardening foundation;
+          - reached 1,003 successful rewrites with zero failures and zero warnings;
+          - passed first-message, sequential and burst delivery gates.
+
+          ## Status
+
+          Historical pre-release promoted to WAJetsamFix 0.7.1 without runtime changes. No historical package is distributed from this entry.
+          EOF_15
+
+          recreate_release "v0.1.0" "WAJetsamFix 0.1.0" "false" "/tmp/notes/01-v0.1.0.md"
+          recreate_release "v0.2.0" "WAJetsamFix 0.2.0" "false" "/tmp/notes/02-v0.2.0.md"
+          recreate_release "v0.3.0" "WAJetsamFix 0.3.0" "false" "/tmp/notes/03-v0.3.0.md"
+          recreate_release "v0.4.0" "WAJetsamFix 0.4.0" "false" "/tmp/notes/04-v0.4.0.md"
+          recreate_release "v0.4.1" "WAJetsamFix 0.4.1" "false" "/tmp/notes/05-v0.4.1.md"
+          recreate_release "v0.5.0" "WAJetsamFix 0.5.0" "false" "/tmp/notes/06-v0.5.0.md"
+          recreate_release "v0.5.1" "WAJetsamFix 0.5.1" "false" "/tmp/notes/07-v0.5.1.md"
+          recreate_release "v0.6.0" "WAJetsamFix 0.6.0" "false" "/tmp/notes/08-v0.6.0.md"
+          recreate_release "v0.6.1" "WAJetsamFix 0.6.1" "false" "/tmp/notes/09-v0.6.1.md"
+          recreate_release "v0.6.2" "WAJetsamFix 0.6.2" "false" "/tmp/notes/10-v0.6.2.md"
+          recreate_release "v0.7.0-alpha1" "WAJetsamFix 0.7.0 Alpha 1" "true" "/tmp/notes/11-v0.7.0-alpha1.md"
+          recreate_release "v0.7.0-alpha2" "WAJetsamFix 0.7.0 Alpha 2" "true" "/tmp/notes/12-v0.7.0-alpha2.md"
+          recreate_release "v0.7.0-rc1" "WAJetsamFix 0.7.0 RC1" "true" "/tmp/notes/13-v0.7.0-rc1.md"
+          recreate_release "v0.7.0" "WAJetsamFix 0.7.0" "false" "/tmp/notes/14-v0.7.0.md"
+          recreate_release "v0.7.1-rc1" "WAJetsamFix 0.7.1 RC1" "true" "/tmp/notes/15-v0.7.1-rc1.md"
+
+          cat > /tmp/notes/current.md <<'EOF_CURRENT'
+          Stable source-side Jetsam protection for WhatsApp's notification `ServiceExtension` on Dopamine 2 RootHide.
+
+          ## What it changes
+
+          - validates the exact WhatsApp notification `ServiceExtension` target;
+          - changes only an exact 24 MB candidate to 40 MB;
+          - leaves unrelated processes, commands and memory values untouched;
+          - performs no global Jetsam modification.
+
+          ## Runtime design
+
+          - source-side interception inside `runningboardd`;
+          - candidate-first hot path;
+          - safe handling of malformed and unknown requests;
+          - no polling daemon, periodic scan, timer, fallback enforcement or repair loop;
+          - event-driven local diagnostics;
+          - non-resident `wajetsamfixctl status` command.
+
+          ## Final validation
+
+          - 1,003 successful rewrites from 1,003 attempts;
+          - zero rewrite failures;
+          - zero compatibility warnings;
+          - normal first-message, sequential and burst delivery;
+          - no observed delay or single-tick episode;
+          - approximately 0.0% diagnostics-bridge CPU.
+
+          ## Fully validated environment
+
+          - iPhone 14 Pro Max;
+          - iOS 16.4.1;
+          - Dopamine 2 RootHide 2.4.9.25;
+          - WhatsApp 26.26.73.
+
+          Wider iOS and architecture ranges are package build targets, not a guarantee of validation on every device or future WhatsApp version.
+
+          See the [complete version history](https://github.com/Allukardh/WAJetsamFix-Release/blob/main/CHANGELOG.md).
+
+          ## SHA-256
+
+          ```text
+          17670a96b751ef7f94979e399774931b53511b53c4687b1a5d6d48ab7d7ac115
+          ```
+
+          WAJetsamFix is a personal project provided as-is, without guaranteed individual support, universal future compatibility or a fixed maintenance schedule.
+
+          ---
+
+          > 💙 WAJetsamFix is free and independently maintained. Voluntary sponsorships help support continued testing, maintenance and compatibility work when needed.  
+          > [**Support WAJetsamFix**](https://github.com/sponsors/Allukardh)
+          EOF_CURRENT
+
+          if gh release view v0.7.1 --repo "$REPO" >/dev/null 2>&1; then
+            gh release delete v0.7.1 --repo "$REPO" --yes
+          fi
+
+          git tag -f v0.7.1 "$TARGET_SHA"
+          git push --force origin refs/tags/v0.7.1
+
+          gh release create v0.7.1 "/tmp/current/$PACKAGE" \
+            --repo "$REPO" \
+            --verify-tag \
+            --title "WAJetsamFix 0.7.1" \
+            --notes-file /tmp/notes/current.md \
+            --latest
+
+          test "$(gh api "repos/$REPO/releases/latest" --jq .tag_name)" = "v0.7.1"
+          test "$(gh release view v0.7.1 --repo "$REPO" --json assets --jq '.assets | length')" = "1"
+          test "$(gh release view v0.7.1 --repo "$REPO" --json assets --jq '.assets[0].name')" = "$PACKAGE"
+          test "$(gh release view v0.7.1 --repo "$REPO" --json body --jq '.body | contains("Support WAJetsamFix")')" = "true"
+
+          mapfile -t actual_tags < <(gh api "repos/$REPO/releases?per_page=100" --jq '.[].tag_name')
+          expected_tags=(
+            v0.7.1
+            v0.7.1-rc1
+            v0.7.0
+            v0.7.0-rc1
+            v0.7.0-alpha2
+            v0.7.0-alpha1
+            v0.6.2
+            v0.6.1
+            v0.6.0
+            v0.5.1
+            v0.5.0
+            v0.4.1
+            v0.4.0
+            v0.3.0
+            v0.2.0
+            v0.1.0
+          )
+
+          test "${#actual_tags[@]}" -eq "${#expected_tags[@]}"
+          for i in "${!expected_tags[@]}"; do
+            test "${actual_tags[$i]}" = "${expected_tags[$i]}"
+          done
+
+          for tag in "${expected_tags[@]:1}"; do
+            test "$(gh release view "$tag" --repo "$REPO" --json assets --jq '.assets | length')" = "0"
+          done
+
+          test "$(gh release view v0.7.0-alpha1 --repo "$REPO" --json isPrerelease --jq .isPrerelease)" = "true"
+          test "$(gh release view v0.7.0-alpha2 --repo "$REPO" --json isPrerelease --jq .isPrerelease)" = "true"
+          test "$(gh release view v0.7.0-rc1 --repo "$REPO" --json isPrerelease --jq .isPrerelease)" = "true"
+          test "$(gh release view v0.7.1-rc1 --repo "$REPO" --json isPrerelease --jq .isPrerelease)" = "true"
+
+          rm -rf /tmp/recheck
+          mkdir -p /tmp/recheck
+          gh release download v0.7.1 --repo "$REPO" --pattern "$PACKAGE" --dir /tmp/recheck
+          test "$(sha256sum "/tmp/recheck/$PACKAGE" | awk '{print $1}')" = "$EXPECTED_SHA256"
+
+          git push origin --delete presentation-history || true
