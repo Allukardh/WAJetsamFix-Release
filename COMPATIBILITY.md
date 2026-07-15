@@ -1,6 +1,8 @@
 # Compatibility
 
-## Fully validated environment
+WAJetsamFix editions have independent compatibility scopes. A build target is not the same as field validation.
+
+## RootHide Edition
 
 WAJetsamFix 0.7.1 was fully validated with:
 
@@ -12,33 +14,14 @@ WAJetsamFix 0.7.1 was fully validated with:
 - **RootHide PatchLoader:** 0.0.8 or newer
 - **Target:** `net.whatsapp.WhatsApp.ServiceExtension`
 
-The validated workload included first-message delivery, sequential notifications, bursts, mixed content, screen-locked delivery, target-process changes, Safe Mode recovery, uninstall/reinstall and `runningboardd` lifecycle changes.
+The package is built for arm64 and arm64e with a minimum deployment target of iOS 15.0. This technical range does not guarantee that every device, iOS version, WhatsApp build or RootHide configuration has been field-tested.
 
-Final field validation recorded:
+See [RootHide Edition compatibility](docs/editions/roothide/COMPATIBILITY.md).
 
-- 1,003 successful rewrites from 1,003 attempts;
-- zero rewrite failures;
-- zero compatibility warnings;
-- no observed notification loss attributable to the tweak;
-- no observed delay or single-tick episode attributable to Jetsam;
-- approximately 0.0% idle CPU for the diagnostics bridge.
+## Dopamine Edition
 
-## Build target versus validation
+The intended environment is conventional rootless Dopamine 2 with ElleKit. The edition is not yet field-validated and no public package exists.
 
-The package is built for **arm64 and arm64e** with a minimum deployment target of **iOS 15.0**. This is a technical build range, not a guarantee that every device, iOS version, WhatsApp build or RootHide configuration has been field-tested.
+Compatibility claims will be added only after diagnostic injection, pass-through hook and exact rewrite gates have succeeded on a real device.
 
-## Future WhatsApp versions
-
-WhatsApp may change its extension structure, executable path, memory policy or notification architecture. A newer WhatsApp version should therefore be considered **not yet validated** until tested, even when the tweak installs and appears operational.
-
-WAJetsamFix deliberately avoids broad or speculative matching. Unknown structures and values other than the exact supported 24 MB candidate are passed through unchanged.
-
-## Unsupported environments
-
-The package is not presented as validated for:
-
-- rootful jailbreaks;
-- non-RootHide environments;
-- jailbreaks other than the documented Dopamine 2 RootHide architecture;
-- modified WhatsApp packages with a different ServiceExtension path or identity;
-- systems lacking RootHide PatchLoader or ElleKit.
+See [Dopamine Edition compatibility](docs/editions/dopamine/COMPATIBILITY.md).

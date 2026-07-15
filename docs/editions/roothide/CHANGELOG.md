@@ -30,8 +30,6 @@ Only the latest stable Release retains a downloadable package. Older Releases re
 - No observed delay or single-tick episode attributable to Jetsam.
 - Approximately 0.0% diagnostics-bridge CPU while idle.
 
-[**💙 Sponsor WAJetsamFix**](https://github.com/sponsors/Allukardh)
-
 ## [0.7.1-rc1] — 2026-07-14
 
 - Removed the unnecessary broad compatibility inspection retained by 0.7.0.

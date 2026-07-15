@@ -1,80 +1,72 @@
 # WAJetsamFix
 
-**Targeted Jetsam protection for WhatsApp notifications on Dopamine 2 RootHide.**
+WAJetsamFix provides targeted Jetsam protection for WhatsApp's notification `ServiceExtension` on supported jailbroken iOS environments.
 
-WAJetsamFix addresses delayed, missing or single-tick WhatsApp notifications caused by iOS terminating the WhatsApp notification `ServiceExtension` at its original **24 MB** memory limit.
+The project is maintained as two independent editions. Each edition has its own implementation, package identity, compatibility scope and release lifecycle.
 
-The tweak changes **only that exact WhatsApp target** from **24 MB to 40 MB**. It does not change global Jetsam settings or the limits of unrelated processes.
+## Editions
 
-## Download
+| Edition | Environment | Package | Status |
+|---|---|---|---|
+| **WAJetsamFix — RootHide Edition** | Dopamine 2 RootHide | `com.allukardh.wajetsamfix` | **Stable — 0.7.1** |
+| **WAJetsamFix — Dopamine Edition** | Conventional Dopamine 2 | `com.allukardh.wajetsamfix.dopamine` | **In development — no public package** |
 
-Download the latest stable package from the [Releases](https://github.com/Allukardh/WAJetsamFix-Release/releases/latest) page:
+## WAJetsamFix — RootHide Edition
 
-```text
-com.allukardh.wajetsamfix_0.7.1_iphoneos-arm64.deb
-```
+The stable RootHide Edition intercepts the system memory-limit assignment inside `runningboardd` and changes only the exact WhatsApp notification-extension limit from **24 MB to 40 MB**.
 
-## Architecture
+Its active path is synchronous, source-side and event-driven. Unrelated requests pass directly to iOS. There is no polling enforcement daemon, periodic process scan, repair loop or global Jetsam modification.
 
-- source-side interception inside `runningboardd`;
-- exact WhatsApp `ServiceExtension` executable validation;
-- exact 24 MB → 40 MB rewrite policy;
-- no polling daemon;
-- no periodic process scan;
-- no global Jetsam modification;
-- no fallback enforcement or repair loop;
-- event-driven local diagnostics;
-- arm64 and arm64e support;
-- minimum deployment target: iOS 15.0.
+- [Edition overview](docs/editions/roothide/README.md)
+- [Installation](docs/editions/roothide/INSTALLATION.md)
+- [Compatibility](docs/editions/roothide/COMPATIBILITY.md)
+- [Usage and diagnostics](docs/editions/roothide/USAGE.md)
+- [Troubleshooting](docs/editions/roothide/TROUBLESHOOTING.md)
+- [Uninstallation](docs/editions/roothide/UNINSTALLATION.md)
 
-See the [complete version history](CHANGELOG.md) for the documented evolution from the initial experimental builds to the current stable architecture.
+Download the current stable package from the [official Releases page](https://github.com/Allukardh/WAJetsamFix-Release/releases/latest).
 
-## Requirements
+## WAJetsamFix — Dopamine Edition
 
-- Dopamine 2 RootHide environment;
-- RootHide Patcher;
-- RootHide PatchLoader 0.0.8 or newer;
-- ElleKit;
-- iOS 15.0 or newer.
+The Dopamine Edition is a separate implementation for conventional Dopamine 2 using regular ElleKit tweak injection.
 
-The wider version range above reflects the package build target. The fully validated environment is documented in [COMPATIBILITY.md](COMPATIBILITY.md).
+Development begins with a diagnostic loader-only Alpha. That first Alpha will not install a `memorystatus_control` hook and will not modify any Jetsam limit. Hook pass-through and the exact 24 MB → 40 MB policy will be introduced only after the previous validation gate succeeds.
 
-## Installation
+- [Edition overview](docs/editions/dopamine/README.md)
+- [Development status](docs/editions/dopamine/STATUS.md)
+- [Compatibility target](docs/editions/dopamine/COMPATIBILITY.md)
+- [Changelog](docs/editions/dopamine/CHANGELOG.md)
 
-1. Download the official `.deb` from the latest Release.
-2. Process the downloaded package with **RootHide Patcher** for the RootHide environment.
-3. Install the converted `.deb` through Sileo.
-4. Open the **Dopamine 2 RootHide** app and manually perform a **Userspace Restart**.
+Do not install the RootHide package on conventional Dopamine. No Dopamine Edition package is publicly available yet.
 
-Do not install the original, unconverted package directly.
+## Shared design principles
 
-Sileo does not currently request the required Userspace Restart automatically. This step must be performed manually from the Dopamine 2 RootHide app after installation.
+Both editions are governed by the same conservative policy:
 
-If WAJetsamFix does not behave as expected after the Userspace Restart, use the status command in the Diagnostics section below.
+- only the exact WhatsApp `ServiceExtension` target may be considered;
+- only an exact supported 24 MB candidate may be rewritten to 40 MB;
+- unrelated commands, processes and values must pass through unchanged;
+- unknown layouts must never be guessed, truncated or rewritten;
+- no edition may introduce a global Jetsam change or polling fallback;
+- a successful build alone is never sufficient for stable publication.
 
-The package description shown by Sileo explains the target, behavior and limitations of the tweak.
+## Documentation
 
-## Diagnostics
+- [Documentation index](docs/README.md)
+- [Complete public changelog](CHANGELOG.md)
+- [Compatibility overview](COMPATIBILITY.md)
+- [Support policy](SUPPORT.md)
+- [Package checksums](CHECKSUMS.txt)
 
-WAJetsamFix includes an on-demand status command:
+## Distribution
 
-```sh
-wajetsamfixctl status
-```
+The official public repository contains user-facing documentation and release packages only. Development source, internal architecture records, test evidence and build history remain private.
 
-The command reports the installed version, PatchLoader state, hook state, current source process, rewrite counters and protection health. It is not a resident monitoring process.
+Only the latest stable release is intended to retain a downloadable package. Older Releases remain available as a descending, changelog-only history so users can follow the project's evolution without being offered obsolete packages.
 
-## Package integrity
+## Support
 
-The official SHA-256 checksum is published in [CHECKSUMS.txt](CHECKSUMS.txt) and in the Release notes.
-
-## Support policy
-
-WAJetsamFix is a personal project provided as-is. Installation does not include any promise of individual support, compatibility with every future WhatsApp or jailbreak release, or a fixed maintenance schedule. See [SUPPORT.md](SUPPORT.md).
-
-## Repository scope
-
-This repository is the official public distribution channel for WAJetsamFix. It contains release packages and user-facing documentation; it does not contain the project source code.
+WAJetsamFix is a personal project shared as a courtesy and provided **as-is**. No fixed maintenance schedule, guaranteed individual support or universal compatibility is promised.
 
 ## 💙 Support the project
 
