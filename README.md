@@ -27,6 +27,8 @@ com.allukardh.wajetsamfix_0.7.1_iphoneos-arm64.deb
 - arm64 and arm64e support;
 - minimum deployment target: iOS 15.0.
 
+See the [complete version history](CHANGELOG.md) for the documented evolution from the initial experimental builds to the current stable architecture.
+
 ## Requirements
 
 - Dopamine 2 RootHide environment;
@@ -60,16 +62,16 @@ The official SHA-256 checksum is published in [CHECKSUMS.txt](CHECKSUMS.txt) and
 
 ## Support policy
 
-WAJetsamFix is a personal project provided as-is. Installation does not include any promise of individual support, compatibility with every future WhatsApp or jailbreak release, or continued development. See [SUPPORT.md](SUPPORT.md).
+WAJetsamFix is a personal project provided as-is. Installation does not include any promise of individual support, compatibility with every future WhatsApp or jailbreak release, or a fixed maintenance schedule. See [SUPPORT.md](SUPPORT.md).
 
 ## Repository scope
 
 This repository is the official public distribution channel for WAJetsamFix. It contains release packages and user-facing documentation; it does not contain the project source code.
 
-## 💙 Support WAJetsamFix
+## 💙 Support the project
 
-If WAJetsamFix has been useful to you, you can support its development with a voluntary contribution of any amount.
+WAJetsamFix is free to use and independently maintained.
 
-One-time and monthly sponsorships are available.
+Voluntary sponsorships help support continued testing, maintenance and compatibility work when needed.
 
 [**Sponsor WAJetsamFix**](https://github.com/sponsors/Allukardh)
