@@ -32,6 +32,7 @@ See the [complete version history](CHANGELOG.md) for the documented evolution fr
 ## Requirements
 
 - Dopamine 2 RootHide environment;
+- RootHide Patcher;
 - RootHide PatchLoader 0.0.8 or newer;
 - ElleKit;
 - iOS 15.0 or newer.
@@ -40,9 +41,16 @@ The wider version range above reflects the package build target. The fully valid
 
 ## Installation
 
-1. Download the `.deb` from the latest Release.
-2. Open or share it with Sileo.
-3. Confirm installation and allow the requested userspace restart or respring when prompted.
+1. Download the official `.deb` from the latest Release.
+2. Process the downloaded package with **RootHide Patcher** for the RootHide environment.
+3. Install the converted `.deb` through Sileo.
+4. Open the **Dopamine 2 RootHide** app and manually perform a **Userspace Restart**.
+
+Do not install the original, unconverted package directly.
+
+Sileo does not currently request the required Userspace Restart automatically. This step must be performed manually from the Dopamine 2 RootHide app after installation.
+
+If WAJetsamFix does not behave as expected after the Userspace Restart, use the status command in the Diagnostics section below.
 
 The package description shown by Sileo explains the target, behavior and limitations of the tweak.
 
