@@ -65,3 +65,11 @@ WAJetsamFix is a personal project provided as-is. Installation does not include 
 ## Repository scope
 
 This repository is the official public distribution channel for WAJetsamFix. It contains release packages and user-facing documentation; it does not contain the project source code.
+
+## 💙 Support WAJetsamFix
+
+If WAJetsamFix has been useful to you, you can support its development with a voluntary contribution of any amount.
+
+One-time and monthly sponsorships are available.
+
+[**Sponsor WAJetsamFix**](https://github.com/sponsors/Allukardh)
