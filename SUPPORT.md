@@ -25,10 +25,12 @@ This does not guarantee compatibility with every future release, establish a fix
 Confirm that:
 
 1. the environment matches the documented requirements;
-2. RootHide PatchLoader and ElleKit are installed;
-3. the official package checksum matches;
-4. the device has completed the required userspace restart or respring;
-5. `wajetsamfixctl status` has been checked.
+2. RootHide Patcher, RootHide PatchLoader and ElleKit are installed;
+3. the checksum of the original downloaded package matches the official checksum before conversion;
+4. the downloaded `.deb` was processed with RootHide Patcher;
+5. the converted package, not the original package, was installed through Sileo;
+6. a Userspace Restart was performed manually from the Dopamine 2 RootHide app;
+7. `wajetsamfixctl status` has been checked.
 
 ## Diagnostic information
 
