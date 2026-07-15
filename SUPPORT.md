@@ -7,10 +7,18 @@ WAJetsamFix is a personal project distributed voluntarily and provided **as-is**
 - No individual or immediate technical support is guaranteed.
 - No response time is promised.
 - Compatibility with every device, iOS version, WhatsApp release, tweak combination or jailbreak configuration is not guaranteed.
-- Future updates, maintenance and continued development are not promised.
+- No fixed maintenance schedule, continuous development or compatibility with every future release is promised.
 - Installation and use remain the user's responsibility.
 
 The absence of guaranteed support does not reduce the care taken in development, testing, packaging and documentation. It only makes clear that distributing the tweak does not create an ongoing service obligation.
+
+## Future updates
+
+WAJetsamFix is stable for the documented environment, so updates are expected to be infrequent.
+
+The author actively uses WhatsApp and WAJetsamFix. If a future WhatsApp, iOS, Dopamine or RootHide change makes an update necessary in the author's own environment, the tweak will be reviewed and updated accordingly.
+
+This does not guarantee compatibility with every future release, establish a fixed maintenance schedule, create an individual support obligation or imply that feature requests will be implemented.
 
 ## Before reporting a problem
 
