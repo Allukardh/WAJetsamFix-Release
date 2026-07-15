@@ -29,5 +29,6 @@ This directory contains only user-facing material that is safe for public distri
 - [Frequently asked questions](shared/FAQ.md)
 - [Security and package integrity](shared/SECURITY.md)
 - [Release policy](shared/RELEASES.md)
+- [Release verification](shared/RELEASE-VERIFICATION.md)
 - [Support policy](shared/SUPPORT.md)
 - [Voluntary sponsorships](shared/DONATIONS.md)
