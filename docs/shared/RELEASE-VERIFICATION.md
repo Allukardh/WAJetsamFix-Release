@@ -1,6 +1,6 @@
 # Release verification
 
-The public WAJetsamFix presentation and RootHide Release history were independently verified after publication.
+The public WAJetsamFix presentation and RootHide Release history were verified again after the documentation-only multi-edition update.
 
 ## Current public state
 
@@ -15,34 +15,35 @@ The public WAJetsamFix presentation and RootHide Release history were independen
 - **Package:** `com.allukardh.wajetsamfix`
 - **Version:** `0.7.1`
 - **Architecture:** `iphoneos-arm64`
-- **Release order:** verified from newest to oldest
-- **Current sponsorship note:** present above the downloadable asset
-- **README sponsorship section:** present only at the end of the current public README
-- **Public version history:** complete and linked from the README
-- **Future-update policy:** documented in `SUPPORT.md`
-- **Result:** passed
+- **Release order:** unchanged
+- **Current sponsorship note:** unchanged above the downloadable asset
+- **README sponsorship section:** retained at the end of the public README
+- **Public version history:** complete and linked
+- **Dopamine public package:** none
+- **Result:** documentation-only update passed
 
-This record describes the public repository before the planned documentation-only multi-edition communication. No Dopamine package is currently public.
-
-## Required verification for the documentation-only public update
+## Documentation-only multi-edition update verification
 
 ```text
-[ ] Fábio explicitly authorized the documentation mirror
-[ ] no new tag, Release, pre-release or binary asset created
-[ ] RootHide 0.7.1 remains the only public package
-[ ] RootHide Bootstrap is described as an additional confirmed runtime, not a third package edition
-[ ] Dopamine Edition is labeled Validated privately
-[ ] no public Dopamine download, RC or release date implied
-[ ] 48/72/96 profiles are labeled planned/private
-[ ] Auto is labeled under evaluation
-[ ] technical readiness and public publication are explicitly separated
-[ ] docs/shared/SUSTAINABILITY.md is present and linked
-[ ] support and sponsorship language is synchronized
-[ ] sponsorship does not promise support, private access, features or dates
-[ ] no sponsor threshold, countdown or pay-to-release wording
-[ ] no private source, internal path, raw evidence, tester identity or build log exported
-[ ] the existing 16 Release entries and 0.7.1 asset remain unchanged unless separately approved
+[x] Fábio explicitly authorized the private merge and public documentation mirror
+[x] private feature work was integrated into private main
+[x] no new tag, Release, pre-release or binary asset was created
+[x] RootHide 0.7.1 remains the only public package
+[x] RootHide Bootstrap is described as an additional confirmed runtime, not a third package edition
+[x] Dopamine Edition is labeled Validated privately
+[x] no public Dopamine download, RC or release date is implied
+[x] 48/72/96 profiles are labeled planned/private
+[x] Auto is labeled under evaluation
+[x] technical readiness and public publication are explicitly separated
+[x] docs/shared/SUSTAINABILITY.md is present and linked
+[x] support and sponsorship language is synchronized
+[x] sponsorship does not promise support, private access, features or dates
+[x] no sponsor threshold, countdown or pay-to-release wording exists
+[x] no private source, internal path, raw evidence, tester identity or build log was exported
+[x] the existing 16 Release entries and 0.7.1 asset remain unchanged
 ```
+
+The documentation-only mirror is complete. The existing RootHide 0.7.1 Release notes were not edited during this step; any later post-release Bootstrap note remains a separate maintainer decision.
 
 ## Required verification before a future Dopamine release
 
