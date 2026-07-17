@@ -1,10 +1,21 @@
 # WAJetsamFix documentation
 
-This directory contains only user-facing material that is safe for public distribution.
+This directory contains user-facing material that is safe for public distribution. Development source, internal architecture, raw field evidence and build records remain private.
+
+## Start here
+
+- [Project overview](../README.md)
+- [Public roadmap](shared/ROADMAP.md)
+- [Project sustainability](shared/SUSTAINABILITY.md)
+- [Compatibility overview](../COMPATIBILITY.md)
+- [Complete public changelog](../CHANGELOG.md)
+- [Support policy](../SUPPORT.md)
 
 ## Editions
 
 ### WAJetsamFix — RootHide Edition
+
+The public stable edition for Dopamine 2 RootHide, with the same package runtime-confirmed on RootHide Bootstrap.
 
 - [Overview](editions/roothide/README.md)
 - [Installation](editions/roothide/INSTALLATION.md)
@@ -16,6 +27,8 @@ This directory contains only user-facing material that is safe for public distri
 
 ### WAJetsamFix — Dopamine Edition
 
+A separate conventional-Dopamine implementation that has reached successful private field validation but has no public package or RC.
+
 - [Overview](editions/dopamine/README.md)
 - [Development status](editions/dopamine/STATUS.md)
 - [Compatibility target](editions/dopamine/COMPATIBILITY.md)
@@ -26,6 +39,8 @@ This directory contains only user-facing material that is safe for public distri
 
 ## Shared information
 
+- [Roadmap](shared/ROADMAP.md)
+- [Project sustainability](shared/SUSTAINABILITY.md)
 - [Frequently asked questions](shared/FAQ.md)
 - [Security and package integrity](shared/SECURITY.md)
 - [Release policy](shared/RELEASES.md)
