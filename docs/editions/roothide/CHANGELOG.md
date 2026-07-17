@@ -1,15 +1,19 @@
-# Changelog
+# WAJetsamFix — RootHide Edition changelog
 
-All notable public WAJetsamFix releases and validated development milestones are documented here. Entries are curated for users and intentionally exclude private source, internal implementation notes and sensitive development details.
+This file contains RootHide Edition history only. The Dopamine Edition has a separate changelog and release lifecycle.
 
-## Editions
+## Unreleased — private 0.8 development direction
 
-- **RootHide Edition:** stable at 0.7.1; complete public history follows below.
-- **Dopamine Edition:** in development; no package has been released.
+- Plan a PreferenceLoader-based memory-profile layer while preserving the stable 0.7.1 source-side architecture.
+- Planned finite profiles: Recommended 48 MiB, Expanded 72 MiB and Extreme 96 MiB.
+- Keep 48 MiB as the default and fallback; recommend the smallest profile that provides stable delivery.
+- Reject unrestricted sliders, arbitrary values and undefined maxima.
+- Require confirmation and Userspace Reboot before a changed profile becomes active.
+- Plan diagnostics for the stored profile, profile loaded by the live source epoch and latest valid observed ServiceExtension peak.
+- Evaluate an optional bounded automatic recommendation mode without adding resident polling or monitoring to `runningboardd`.
+- Preserve the same RootHide Edition package path for Dopamine 2 RootHide and RootHide Bootstrap.
 
-Only the latest stable Release retains a downloadable package. Older Releases remain available as separate changelog-only entries in descending order.
-
-## RootHide Edition
+Status: private planning only. No 0.8 Alpha package, public release or release date is available.
 
 ## [0.7.1] — 2026-07-14
 
@@ -18,7 +22,7 @@ Only the latest stable Release retains a downloadable package. Older Releases re
 - Promoted the field-approved 0.7.1 RC1 runtime without changing the protection logic.
 - Restored the minimal candidate-first path: unrelated requests pass through before target inspection.
 - Retained the diagnostics, safety checks and lifecycle hardening developed throughout the 0.7 line.
-- Preserved the exact WhatsApp notification `ServiceExtension` target and exact 24 MB → 40 MB policy.
+- Preserved the exact WhatsApp notification `ServiceExtension` target and exact 24 MiB -> 40 MiB policy.
 - Contains no polling daemon, periodic scan, timer, repair loop, fallback enforcement or global Jetsam modification.
 
 ### Final field validation
@@ -30,10 +34,16 @@ Only the latest stable Release retains a downloadable package. Older Releases re
 - No observed delay or single-tick episode attributable to Jetsam.
 - Approximately 0.0% diagnostics-bridge CPU while idle.
 
+### Post-release compatibility confirmation
+
+- The same 0.7.1 package and source-side protection path were independently runtime-confirmed on RootHide Bootstrap under iOS 16.6.1.
+- The Bootstrap report recorded 7 successful rewrites from 7 attempts, zero failures and zero compatibility warnings.
+- The primary full field-validation baseline remains Dopamine 2 RootHide.
+
 ## [0.7.1-rc1] — 2026-07-14
 
 - Removed the unnecessary broad compatibility inspection retained by 0.7.0.
-- Ensured that non-24 MB requests return directly to iOS before target-path validation.
+- Ensured that non-24 MiB requests return directly to iOS before target-path validation.
 - Kept malformed and unrelated requests unchanged.
 - Preserved safe handling of known and unknown request layouts.
 - Extended testing reached 1,003 successful rewrites with zero failures and zero warnings.
@@ -69,7 +79,7 @@ Only the latest stable Release retains a downloadable package. Older Releases re
 
 - Final stable release of the original pure source-side candidate-first design.
 - Corrected diagnostic state across `runningboardd` restarts and source lifecycles.
-- Preserved the exact target and exact 24 MB → 40 MB policy.
+- Preserved the exact target and exact 24 MiB -> 40 MiB policy.
 - Became the proven fallback baseline used to evaluate the later 0.7 work.
 
 ## [0.6.1] — 2026-07-13
@@ -105,21 +115,21 @@ Only the latest stable Release retains a downloadable package. Older Releases re
 
 ## [0.4.0] — 2026-07-11
 
-- Raised the target active and inactive limits from 32 MB to 40 MB.
-- Confirmed that the original 24 MB ceiling was insufficient.
+- Raised the target active and inactive limits from 32 MiB to 40 MiB.
+- Confirmed that the original 24 MiB ceiling was insufficient.
 - Delivered reliable notifications, but continuous diagnostics and polling were too expensive for the final design.
 
 ## [0.3.0] — 2026-07-11
 
 - Replaced fixed global monitoring with adaptive enforcement tied to the active target process.
-- Applied and verified a 32 MB limit when iOS restored the original 24 MB value.
+- Applied and verified a 32 MiB limit when iOS restored the original 24 MiB value.
 - Greatly improved delivery reliability, although an occasional single-tick episode remained.
 
 ## [0.2.0] — 2026-07-11
 
 - Replaced the unsuccessful injected-client design with a standalone root process.
 - Added direct discovery of the exact WhatsApp notification `ServiceExtension`.
-- Restored notifications with targeted 32 MB enforcement and proved the central memory-limit hypothesis.
+- Restored notifications with targeted 32 MiB enforcement and proved the central memory-limit hypothesis.
 - Fixed 100 ms polling was effective but too expensive for long-term use.
 
 ## [0.1.0] — 2026-07-11
@@ -128,12 +138,3 @@ Only the latest stable Release retains a downloadable package. Older Releases re
 - The privileged component started, but the client connection did not complete.
 - No memory-limit change reached the target.
 - Established the first experimental baseline for the investigation.
-
-## Dopamine Edition
-
-### Unreleased — Alpha 0 planned
-
-- Separate conventional Dopamine 2 package and implementation.
-- Initial loader-only diagnostic build through regular ElleKit injection.
-- No `memorystatus_control` hook in Alpha 0.
-- No Jetsam rewrite or WhatsApp protection in Alpha 0.
