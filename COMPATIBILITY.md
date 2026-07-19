@@ -34,7 +34,7 @@ RootHide Bootstrap is an additional environment for the same RootHide Edition pa
 
 The package is built for arm64 and arm64e with a minimum deployment target of iOS 15.0. This technical range does not guarantee that every device, iOS version, WhatsApp build or RootHide configuration has been field-tested.
 
-The planned private RootHide 0.8 profiles and automatic recommendation research are not part of stable 0.7.1 and are not current compatibility claims.
+The private RootHide 0.8 profile and calibration layer is not part of stable 0.7.1 and is not a current public compatibility claim. Its [Alpha 2.1 evidence](docs/editions/roothide/evidence/0.8.0-alpha2.1/README.md) documents one private test environment only.
 
 See [RootHide Edition compatibility](docs/editions/roothide/COMPATIBILITY.md).
 
@@ -56,7 +56,7 @@ The private environment was an `iPhone15,3` on iOS 16.3.1 with WhatsApp 26.26.73
 
 The heavy restored-data profile consumed more memory than the RootHide Edition's stable 40 MiB policy. The current Alpha used a temporary 96 MiB diagnostic ceiling; that value is not automatically the final Dopamine policy.
 
-A future Dopamine RC is planned to receive 48/72/96 MiB profiles only after the profile layer passes private RootHide validation. Automatic recommendation remains under evaluation and is not yet a compatibility claim.
+A future Dopamine RC may receive the privately validated RootHide 48/72/96 MiB profile and calibration design. That work has not been ported and is not yet a Dopamine compatibility claim.
 
 No conventional Dopamine combination is approved for public compatibility yet. A successful private Alpha on one environment does not establish universal support, RC readiness or a public package.
 

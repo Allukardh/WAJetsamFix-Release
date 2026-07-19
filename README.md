@@ -83,25 +83,27 @@ Voluntary sponsorship helps offset the work and costs required to turn private e
 
 See the [project sustainability policy](docs/shared/SUSTAINABILITY.md) and [support policy](SUPPORT.md).
 
-## What may come next
+## Private RootHide 0.8 development
 
-A private RootHide 0.8 Alpha is planned to evaluate a memory-profile layer while preserving the proven 0.7.1 runtime architecture.
+RootHide 0.8.0 Alpha 2.1 is now in private on-device testing. It adds a memory-profile and bounded calibration layer while preserving the proven 0.7.1 runtime architecture.
 
-Planned manual profiles:
+Manual profiles in the private Alpha:
 
 | Profile | Limit | Role |
 |---|---:|---|
-| **Recommended** | **48 MiB** | Planned default with modest headroom over the historical 40 MiB policy. |
+| **Recommended** | **48 MiB** | Smallest profile, used after a validated recommendation when sufficient. |
 | **Expanded** | **72 MiB** | For environments where the recommended profile is insufficient. |
-| **Extreme** | **96 MiB** | For unusually demanding databases or WhatsApp versions. |
+| **Extreme** | **96 MiB** | Safe initial and calibration ceiling for unusually demanding environments. |
 
-The smallest stable profile should always be used. A larger ceiling does not reserve memory and does not improve performance by itself. No unrestricted slider or arbitrary value is planned.
+The smallest stable profile should always be used. A larger ceiling does not reserve memory and does not improve performance by itself. No unrestricted slider or arbitrary value is used.
 
-An optional automatic recommendation mode is also under technical evaluation. Any accepted design must remain bounded to the validated profiles, show the observed ServiceExtension peak, avoid resident polling and require a safe Userspace Reboot path before a changed profile becomes active.
+The private Alpha automatically calibrates the exact rewritten WhatsApp `ServiceExtension` outside `runningboardd`. One distinct valid instance provides a preliminary result; three validate the smallest supported recommendation. Calibration never applies its recommendation automatically, and every profile change still requires explicit confirmation and Userspace Reboot.
 
-The profile layer will be developed privately on RootHide first. If approved, it may be adapted for a future private Dopamine Edition RC rather than being mixed into the current Dopamine Alpha stabilization work.
+Current private device evidence records a 26.59 MiB highest observed peak and a validated 48 MiB recommendation. See the [RootHide 0.8.0 Alpha 2.1 evidence page](docs/editions/roothide/evidence/0.8.0-alpha2.1/README.md).
 
-These plans may change, pause or remain private. They are not release promises.
+The profile layer is being validated privately on RootHide first. If approved, it may later be adapted for a future private Dopamine Edition RC rather than being mixed into the current Dopamine Alpha stabilization work.
+
+This work may change, pause or remain private. It is not a release promise.
 
 See the [public roadmap](docs/shared/ROADMAP.md) for the remaining stabilization, lifecycle, recovery and product gates.
 

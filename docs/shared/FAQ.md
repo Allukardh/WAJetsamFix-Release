@@ -26,21 +26,23 @@ Technical readiness and public publication are separate decisions. A private Alp
 
 Publication depends on technical safety, expected support burden, available personal and family time, infrastructure costs and whether continued public development is sustainable.
 
-## What memory profiles are planned?
+## What memory profiles are being tested?
 
-A private RootHide 0.8 Alpha is planned to evaluate three finite profiles:
+A private RootHide 0.8 Alpha is testing three finite profiles:
 
 - Recommended — 48 MiB;
 - Expanded — 72 MiB;
 - Extreme — 96 MiB.
 
-These values are a development direction, not a released feature or release promise. The smallest stable profile should always be preferred. Larger limits do not improve performance by themselves and do not reserve that memory permanently.
+These values are not a released feature or release promise. The smallest stable profile should always be preferred. Larger limits do not improve performance by themselves and do not reserve that memory permanently.
 
-## Will there be automatic profile selection?
+## How does private Alpha calibration work?
 
-An optional automatic recommendation mode is under evaluation. A safe design must remain bounded to validated profiles, show the observed ServiceExtension peak, avoid resident polling and use a confirmed Userspace Reboot path before a changed profile becomes active.
+The private RootHide Alpha uses 96 MiB as its safe initial and calibration ceiling. A bounded observer measures only the exact rewritten `ServiceExtension` PID outside `runningboardd`. One distinct valid instance provides a preliminary result; three validate the smallest supported recommendation.
 
-No continuous unrestricted self-tuning design is approved.
+Calibration never changes the profile automatically. Applying a validated recommendation requires explicit user confirmation and Userspace Reboot. No continuous unrestricted self-tuning design is used.
+
+This design has not been ported to the Dopamine Edition and is not a public feature or compatibility claim.
 
 ## Why is only the current stable package downloadable?
 
