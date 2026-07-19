@@ -2,18 +2,21 @@
 
 This file contains RootHide Edition history only. The Dopamine Edition has a separate changelog and release lifecycle.
 
-## Unreleased — private 0.8 development direction
+## Unreleased — private 0.8 Alpha validation
 
-- Plan a PreferenceLoader-based memory-profile layer while preserving the stable 0.7.1 source-side architecture.
-- Planned finite profiles: Recommended 48 MiB, Expanded 72 MiB and Extreme 96 MiB.
-- Keep 48 MiB as the default and fallback; recommend the smallest profile that provides stable delivery.
+- Added a PreferenceLoader-based memory-profile layer while preserving the stable 0.7.1 source-side architecture.
+- Added finite profiles: Recommended 48 MiB, Expanded 72 MiB and Extreme 96 MiB.
+- Use 96 MiB as the safe initial and calibration ceiling before recommending the smallest validated profile.
 - Reject unrestricted sliders, arbitrary values and undefined maxima.
 - Require confirmation and Userspace Reboot before a changed profile becomes active.
-- Plan diagnostics for the stored profile, profile loaded by the live source epoch and latest valid observed ServiceExtension peak.
-- Evaluate an optional bounded automatic recommendation mode without adding resident polling or monitoring to `runningboardd`.
+- Added diagnostics for the stored profile, profile loaded by the live source epoch and latest valid observed `ServiceExtension` peak.
+- Added bounded automatic calibration outside `runningboardd`, with one distinct PID producing a preliminary result and three validating it.
+- Keep recommendations manual: calibration never applies a profile automatically.
+- Added local calibration eligibility and environment reporting.
+- Recorded private Alpha 2.1 evidence with a 26.59 MiB highest observed peak and a validated 48 MiB recommendation.
 - Preserve the same RootHide Edition package path for Dopamine 2 RootHide and RootHide Bootstrap.
 
-Status: private planning only. No 0.8 Alpha package, public release or release date is available.
+Status: private on-device Alpha testing only. No 0.8 package, public release or release date is available.
 
 ## [0.7.1] — 2026-07-14
 

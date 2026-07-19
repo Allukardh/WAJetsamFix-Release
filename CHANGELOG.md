@@ -11,18 +11,21 @@ Historical Releases remain available as changelog-only entries. The current stab
 
 ## RootHide Edition
 
-### Unreleased — private 0.8 direction
+### Unreleased — private 0.8 Alpha validation
 
-- Plan a PreferenceLoader-based memory-profile layer without replacing the proven 0.7.1 source-side architecture.
-- Planned finite profiles: Recommended 48 MiB, Expanded 72 MiB and Extreme 96 MiB.
-- Keep 48 MiB as the planned default and fallback; recommend the smallest profile that provides stable delivery.
+- Added a PreferenceLoader-based memory-profile layer without replacing the proven 0.7.1 source-side architecture.
+- Added finite profiles: Recommended 48 MiB, Expanded 72 MiB and Extreme 96 MiB.
+- Use 96 MiB as the safe initial and calibration ceiling before recommending the smallest validated profile.
 - Reject unrestricted sliders and arbitrary memory values.
 - Require confirmation and Userspace Reboot before a profile change becomes active.
-- Plan diagnostics for stored, live-loaded and recommended profiles plus the latest valid observed ServiceExtension peak.
-- Evaluate an optional bounded automatic recommendation mode without adding resident polling.
+- Added diagnostics for stored, live-loaded and recommended profiles plus the latest valid observed `ServiceExtension` peak.
+- Added bounded automatic calibration outside `runningboardd`; one distinct PID provides a preliminary result and three validate it.
+- Keep recommendations manual: calibration never applies a profile automatically.
+- Added local calibration eligibility and environment reporting.
+- Recorded private Alpha 2.1 evidence with a 26.59 MiB highest observed peak and a validated 48 MiB recommendation.
 - Require primary Dopamine 2 RootHide validation followed by separate RootHide Bootstrap confirmation.
 
-Status: private planning only. No 0.8 package or release date is available.
+Status: private on-device Alpha testing only. No 0.8 package, public release or release date is available.
 
 ## [0.7.1] — 2026-07-14
 

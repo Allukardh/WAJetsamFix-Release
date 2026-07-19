@@ -52,17 +52,17 @@ More than 2,800 exact rewrites were retained with zero failures and zero compati
 
 The existence of a working private engine demonstrates technical progress. It does not guarantee that the edition will be published.
 
-## Planned private RootHide 0.8 Alpha
+## Validated privately — RootHide 0.8 Alpha
 
-A future private RootHide 0.8 Alpha is planned to evaluate a user-facing memory-profile layer without replacing the proven source-side architecture.
+RootHide 0.8.0 Alpha 2.1 is in private on-device testing. It adds a user-facing memory-profile and bounded calibration layer without replacing the proven source-side architecture.
 
-Planned manual profiles:
+Manual profiles in the private Alpha:
 
 | Profile | Limit | Intended role |
 |---|---:|---|
-| **Recommended** | **48 MiB** | Default starting point with modest headroom over the historical 40 MiB policy. |
+| **Recommended** | **48 MiB** | Smallest profile, used after a validated recommendation when sufficient. |
 | **Expanded** | **72 MiB** | For environments where the recommended profile is insufficient. |
-| **Extreme** | **96 MiB** | For unusually demanding restored databases or WhatsApp versions. |
+| **Extreme** | **96 MiB** | Safe initial and calibration ceiling for unusually demanding environments. |
 
 Design rules:
 
@@ -70,26 +70,29 @@ Design rules:
 - a larger limit does not reserve that memory and does not improve performance by itself;
 - no unrestricted slider, arbitrary value or undefined maximum;
 - profile changes require confirmation and a Userspace Reboot;
-- invalid or missing configuration must fall back safely to 48 MiB;
+- new or recalibrated environments use the 96 MiB ceiling before a smaller profile is recommended;
 - no preference lookup, disk access or monitoring may be added to the `runningboardd` hot path.
 
-The profile layer will be developed and privately validated on RootHide first. If it succeeds and development advances to a private Dopamine RC, the validated design may be adapted there.
+Automatic calibration is bounded to an exact rewritten `ServiceExtension` PID and runs outside `runningboardd`. One distinct valid instance provides a preliminary result; three validate the smallest supported recommendation. The recommendation is never applied automatically.
+
+The current private evidence records a 26.59 MiB highest observed peak and a validated 48 MiB recommendation on the maintainer's test environment. See the [RootHide 0.8.0 Alpha 2.1 evidence page](../editions/roothide/evidence/0.8.0-alpha2.1/README.md).
+
+The profile layer is being privately validated on RootHide first. If development later advances to a private Dopamine RC, the validated design may be adapted there.
 
 Neither RootHide 0.8 nor a Dopamine profile build is promised for public release.
 
-## Automatic profile selection — under evaluation
+## Automatic calibration — validated privately
 
-An optional automatic mode is being researched, but no implementation is approved yet.
+The private RootHide Alpha implements the approved bounded design:
 
-A safe automatic design must remain bounded to the same validated profiles and must not introduce a resident polling daemon. The preferred direction is a separate, time-bounded calibration or diagnostic helper that:
+1. an observer starts only for the exact rewritten `ServiceExtension` PID while the 96 MiB calibration ceiling is loaded;
+2. each observer exits with the target process or after 120 seconds;
+3. the highest valid peak and its local environment are retained;
+4. one distinct PID provides a preliminary result and three validate it;
+5. only 48, 72 or 96 MiB can be recommended;
+6. a profile change still requires explicit confirmation and Userspace Reboot.
 
-1. observes the exact `ServiceExtension` physical-memory peak outside the hook;
-2. stores the highest valid observed peak and its test context;
-3. recommends one of the validated 48/72/96 MiB profiles with a deliberate safety margin;
-4. shows the observed peak and recommendation in Preferences;
-5. applies a changed profile only after confirmation and Userspace Reboot.
-
-Continuous silent self-modification, an unrestricted calculated limit and per-call monitoring inside `runningboardd` are outside the accepted architecture.
+Continuous silent profile changes, an unrestricted calculated limit and per-call monitoring inside `runningboardd` remain outside the accepted architecture.
 
 ## Before a private Dopamine Edition RC
 

@@ -23,23 +23,25 @@ The implementation is source-side, synchronous and event-driven. It has no polli
 - Fully validated environment: Dopamine 2 RootHide
 - Additional confirmed runtime: RootHide Bootstrap
 
-## Private 0.8 direction
+## Private 0.8 validation
 
-A future private RootHide 0.8 Alpha is planned to evaluate a PreferenceLoader-based memory-profile layer without changing the proven source-side protection contract.
+RootHide 0.8.0 Alpha 2.1 is now running in private on-device testing. It adds a PreferenceLoader-based memory-profile and calibration layer without changing the proven source-side protection contract.
 
-Planned manual profiles:
+Available manual profiles in the private Alpha:
 
 | Profile | Limit | Purpose |
 |---|---:|---|
-| **Recommended** | **48 MiB** | Planned default with modest headroom over the stable 40 MiB baseline. |
+| **Recommended** | **48 MiB** | Smallest profile, used after a validated recommendation when sufficient. |
 | **Expanded** | **72 MiB** | For environments where 48 MiB is insufficient. |
 | **Extreme** | **96 MiB** | For unusually demanding restored databases or WhatsApp versions. |
 
-The design will recommend the smallest stable profile, reject arbitrary values and require confirmation plus Userspace Reboot when the selected profile changes.
+The safe initial and calibration ceiling is 96 MiB. A bounded observer measures only an exact rewritten WhatsApp `ServiceExtension` PID outside `runningboardd`. One distinct valid instance provides a preliminary result; three validate the recommendation.
 
-An optional automatic recommendation mode is under evaluation. Any accepted design must use bounded calibration outside the `runningboardd` hot path, show the observed ServiceExtension peak and choose only among validated profiles. No resident polling or unrestricted self-tuning is planned.
+Calibration recommends the smallest supported profile but never applies it automatically. Profile changes require explicit confirmation and Userspace Reboot. No resident polling, arbitrary value or unrestricted self-tuning is used.
 
-Version 0.8 is private planning only. It has no package, public release or release date. Even a technically successful private Alpha does not guarantee that 0.8 will be published.
+The current private device evidence records three valid instances, a 26.59 MiB highest observed peak and a validated 48 MiB recommendation. See the [RootHide 0.8.0 Alpha 2.1 evidence page](evidence/0.8.0-alpha2.1/README.md).
+
+Version 0.8 remains private. It has no public package, public release or release date. Even a technically successful private Alpha does not guarantee that 0.8 will be published.
 
 The current public stable release remains 0.7.1 under its documented **as-is** support terms.
 
