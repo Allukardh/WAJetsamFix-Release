@@ -45,8 +45,7 @@ jobs:
           if start < 0:
               raise SystemExit("Sponsor block was not found in v0.7.1")
           sponsor = old[start:].rstrip()
-          expected_link = "**[Support WAJetsamFix](https://github.com/sponsors/Allukardh)**"
-          if expected_link not in sponsor:
+          if "Support WAJetsamFix" not in sponsor or "https://github.com/sponsors/Allukardh" not in sponsor:
               raise SystemExit("Sponsor link was not found in the v0.7.1 block")
           if "Support WAJetsamFix" in current or "github.com/sponsors/Allukardh" in current:
               raise SystemExit("v0.8.0 already contains a sponsor block")
