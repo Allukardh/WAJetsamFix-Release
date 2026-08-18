@@ -16,6 +16,7 @@
 - [Release policy](shared/RELEASES.md)
 - [FAQ](shared/FAQ.md)
 - [Support](shared/SUPPORT.md)
+- [Acknowledgments](shared/ACKNOWLEDGMENTS.md)
 - [Security](shared/SECURITY.md)
 - [Donations](shared/DONATIONS.md)
 

@@ -40,6 +40,7 @@ See [CHECKSUMS.txt](CHECKSUMS.txt) and [release verification](docs/shared/RELEAS
 - [Documentation index](docs/README.md)
 - [Compatibility](COMPATIBILITY.md)
 - [Support](SUPPORT.md)
+- [Acknowledgments](docs/shared/ACKNOWLEDGMENTS.md)
 - [Security policy](docs/shared/SECURITY.md)
 - [Donations](docs/shared/DONATIONS.md)
 
