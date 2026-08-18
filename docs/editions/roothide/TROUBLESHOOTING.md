@@ -1,15 +1,18 @@
-# RootHide Edition troubleshooting
+# RootHide troubleshooting
 
-Confirm all of the following before reporting a problem:
+## Settings panel or icon is missing
 
-1. the original Release package checksum was verified before conversion;
-2. the package was processed with RootHide Patcher;
-3. the converted package was installed;
-4. a Userspace Restart was performed from the Dopamine 2 RootHide app;
-5. RootHide PatchLoader and ElleKit are installed;
-6. at least one WhatsApp notification was received after restart;
-7. `/var/jb/usr/bin/wajetsamfixctl status` was run as root.
+1. Confirm that RootHide Patcher was used on the downloaded package.
+2. Reinstall the patched package through Sileo.
+3. Perform a Userspace Reboot.
+4. Reopen Settings.
 
-In Safe Mode, either `PatchLoader: unavailable` or `PatchLoader: safe-mode-skipped` is acceptable when the source hook is unconfirmed and no rewrite occurs.
+## Changes are not active
 
-Do not attempt to compensate by enabling a global Jetsam multiplier, polling daemon or unrelated memory tweak as part of WAJetsamFix troubleshooting.
+Confirm the selected profile in the WAJetsamFix panel and perform the requested Userspace Reboot. The calibration assistant recommends a profile but never applies it automatically.
+
+## Integrity check fails
+
+Delete the downloaded file and obtain it again from the [official v0.8.0 release](https://github.com/Allukardh/WAJetsamFix-Release/releases/tag/v0.8.0). Do not install a package whose SHA-256 differs from [CHECKSUMS.txt](../../../CHECKSUMS.txt).
+
+If the problem remains, read [support](../../../SUPPORT.md) before reporting it.

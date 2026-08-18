@@ -1,8 +1,7 @@
-# RootHide Edition uninstallation
+# Uninstalling RootHide 0.8.0
 
-1. Start Dopamine with tweak injection disabled when necessary.
-2. Remove WAJetsamFix through Sileo.
-3. Perform a Userspace Restart.
-4. Confirm normal WhatsApp behavior.
+1. Remove WAJetsamFix through Sileo.
+2. Perform a Userspace Reboot.
+3. Confirm that the WAJetsamFix settings panel is no longer present.
 
-Removing WAJetsamFix does not modify WhatsApp messages, databases, backups or application files.
+If the package manager reports an error, do not remove files manually; collect the visible error and follow the [support guide](../../../SUPPORT.md).

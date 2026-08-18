@@ -1,30 +1,15 @@
-# RootHide Edition usage and diagnostics
+# Using RootHide 0.8.0
 
-WAJetsamFix operates automatically after the required Userspace Restart.
+Open **Settings → WAJetsamFix**.
 
-Run the non-resident status command as root:
+Choose one of the supported manual profiles:
 
-```sh
-/var/jb/usr/bin/wajetsamfixctl status
-```
+- 48 MB
+- 72 MB
+- 96 MB
 
-A healthy state after at least one matching WhatsApp notification resembles:
+The calibration assistant can recommend one of these profiles. It does not apply the recommendation automatically; review the result and choose the profile yourself.
 
-```text
-WAJetsamFix version: 0.7.1
-PatchLoader: hook-installed
-Source hook: installed
-Protection: confirmed
-Successful rewrites: > 0
-Failed rewrites: 0
-Compatibility warnings: 0
-Polling fallback: absent
-```
+After changing the active profile, follow the panel prompt and perform a Userspace Reboot. Return to the panel to confirm the current version and status.
 
-Immediately after a new `runningboardd` instance begins, waiting state and zero counters are expected until the first matching request.
-
-The runtime log is stored at:
-
-```text
-/var/mobile/Library/Logs/WAJetsamFix-source.log
-```
+If the panel is missing or the status is not healthy, follow the [troubleshooting guide](TROUBLESHOOTING.md).

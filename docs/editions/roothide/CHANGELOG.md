@@ -1,143 +1,23 @@
-# WAJetsamFix — RootHide Edition changelog
+# RootHide changelog
 
-This file contains RootHide Edition history only. The Dopamine Edition has a separate changelog and release lifecycle.
+## 0.8.0 — stable
 
-## Unreleased — private 0.8 Alpha validation
+- Final 0.8.0 product identity and public package.
+- Manual 48 MB, 72 MB and 96 MB profiles.
+- Bounded calibration assistant with manual-only recommendations.
+- Final PreferenceLoader panel, descriptions and icon.
+- Userspace Reboot integration for RootHide.
+- Scoped operation without global Jetsam changes, background polling, automatic repair or silent profile application.
 
-- Added a PreferenceLoader-based memory-profile layer while preserving the stable 0.7.1 source-side architecture.
-- Added finite profiles: Recommended 48 MiB, Expanded 72 MiB and Extreme 96 MiB.
-- Use 96 MiB as the safe initial and calibration ceiling before recommending the smallest validated profile.
-- Reject unrestricted sliders, arbitrary values and undefined maxima.
-- Require confirmation and Userspace Reboot before a changed profile becomes active.
-- Added diagnostics for the stored profile, profile loaded by the live source epoch and latest valid observed `ServiceExtension` peak.
-- Added bounded automatic calibration outside `runningboardd`, with one distinct PID producing a preliminary result and three validating it.
-- Keep recommendations manual: calibration never applies a profile automatically.
-- Added local calibration eligibility and environment reporting.
-- Recorded private Alpha 2.1 evidence with a 26.59 MiB highest observed peak and a validated 48 MiB recommendation.
-- Preserve the same RootHide Edition package path for Dopamine 2 RootHide and RootHide Bootstrap.
+## 0.8 prereleases
 
-Status: private on-device Alpha testing only. No 0.8 package, public release or release date is available.
+- **Alpha 1:** settings foundation and manual profiles.
+- **Alpha 1.1:** PreferenceLoader registration and restart-signaling correction.
+- **Alpha 1.2:** settings container and panel correction.
+- **Alpha 1.3:** RootHide Userspace Reboot alignment.
+- **Alpha 2:** bounded calibration and manual recommendation flow.
+- **Alpha 2.1:** final UI-state and description refinement; runtime behavior unchanged.
 
-## [0.7.1] — 2026-07-14
+No 0.8 release candidate was published.
 
-### Final stable release
-
-- Promoted the field-approved 0.7.1 RC1 runtime without changing the protection logic.
-- Restored the minimal candidate-first path: unrelated requests pass through before target inspection.
-- Retained the diagnostics, safety checks and lifecycle hardening developed throughout the 0.7 line.
-- Preserved the exact WhatsApp notification `ServiceExtension` target and exact 24 MiB -> 40 MiB policy.
-- Contains no polling daemon, periodic scan, timer, repair loop, fallback enforcement or global Jetsam modification.
-
-### Final field validation
-
-- 1,003 successful rewrites from 1,003 attempts.
-- Zero rewrite failures.
-- Zero compatibility warnings.
-- Normal first-message, sequential and burst notification delivery.
-- No observed delay or single-tick episode attributable to Jetsam.
-- Approximately 0.0% diagnostics-bridge CPU while idle.
-
-### Post-release compatibility confirmation
-
-- The same 0.7.1 package and source-side protection path were independently runtime-confirmed on RootHide Bootstrap under iOS 16.6.1.
-- The Bootstrap report recorded 7 successful rewrites from 7 attempts, zero failures and zero compatibility warnings.
-- The primary full field-validation baseline remains Dopamine 2 RootHide.
-
-## [0.7.1-rc1] — 2026-07-14
-
-- Removed the unnecessary broad compatibility inspection retained by 0.7.0.
-- Ensured that non-24 MiB requests return directly to iOS before target-path validation.
-- Kept malformed and unrelated requests unchanged.
-- Preserved safe handling of known and unknown request layouts.
-- Extended testing reached 1,003 successful rewrites with zero failures and zero warnings.
-
-## [0.7.0] — 2026-07-14
-
-- Consolidated runtime version, target and diagnostic state handling.
-- Made hook-install reporting authoritative and resistant to false-positive states.
-- Added safer request validation, sparse diagnostics and an on-demand status command.
-- Corrected diagnostic state across `runningboardd` lifecycle changes.
-- Hardened the local log and removed unnecessary background relaunch behavior.
-- Superseded by 0.7.1 after review found an extra synchronous compatibility inspection unnecessary for the supported scope.
-
-## [0.7.0-rc1] — 2026-07-14
-
-- Promoted the Alpha 2 runtime without redesigning the protection path.
-- Validated direct upgrade, Safe Mode prevention and recovery, complete uninstall and clean reinstall.
-- Completed a mixed-notification gate exceeding 50 rewrites with zero failures or unexpected warnings.
-
-## [0.7.0-alpha2] — 2026-07-14
-
-- Corrected retained diagnostic state across new `runningboardd` instances.
-- Required current-process state before reporting confirmed protection.
-- Recorded 16 successful rewrites from 16 attempts with zero failures and zero warnings.
-
-## [0.7.0-alpha1] — 2026-07-14
-
-- Introduced explicit PatchLoader and source-hook states.
-- Added safer request handling, sparse compatibility diagnostics and the non-resident status command.
-- Completed more than 300 successful source-side rewrites with zero failures and zero compatibility warnings.
-
-## [0.6.2] — 2026-07-13
-
-- Final stable release of the original pure source-side candidate-first design.
-- Corrected diagnostic state across `runningboardd` restarts and source lifecycles.
-- Preserved the exact target and exact 24 MiB -> 40 MiB policy.
-- Became the proven fallback baseline used to evaluate the later 0.7 work.
-
-## [0.6.1] — 2026-07-13
-
-- Removed the polling enforcement daemon, watchdog and recurring repair loops.
-- Retained only the PatchLoader entry, source hook and event-driven diagnostics bridge.
-- Confirmed reliable delivery and approximately 0.0% diagnostics-bridge CPU.
-
-## [0.6.0] — 2026-07-13
-
-- Introduced RootHide PatchLoader integration and early source-side interception inside `runningboardd`.
-- Added dynamic jailbreak-root discovery and Safe Mode checks.
-- Established the architecture that replaced polling-based enforcement.
-
-## [0.5.1] — 2026-07-12
-
-- Replaced sandbox-dependent diagnostic file writes with event-driven state delivery.
-- Added a lightweight root diagnostics bridge.
-- Confirmed that ordinary tweak loading did not place the source hook inside `runningboardd`.
-- Produced the evidence needed for the PatchLoader architecture.
-
-## [0.5.0] — 2026-07-12
-
-- Introduced the first filtered source-side interception attempt through ordinary tweak loading.
-- Retained the working compatibility path until source-side ownership could be proven.
-- Demonstrated that a working compatibility layer could conceal an inactive experimental source path.
-
-## [0.4.1] — 2026-07-12
-
-- Produced the stable polling compatibility baseline for the tested environment.
-- Reduced diagnostic overhead while retaining rapid targeted enforcement.
-- Delivered reliable notifications, but resident CPU use remained because polling was still required.
-
-## [0.4.0] — 2026-07-11
-
-- Raised the target active and inactive limits from 32 MiB to 40 MiB.
-- Confirmed that the original 24 MiB ceiling was insufficient.
-- Delivered reliable notifications, but continuous diagnostics and polling were too expensive for the final design.
-
-## [0.3.0] — 2026-07-11
-
-- Replaced fixed global monitoring with adaptive enforcement tied to the active target process.
-- Applied and verified a 32 MiB limit when iOS restored the original 24 MiB value.
-- Greatly improved delivery reliability, although an occasional single-tick episode remained.
-
-## [0.2.0] — 2026-07-11
-
-- Replaced the unsuccessful injected-client design with a standalone root process.
-- Added direct discovery of the exact WhatsApp notification `ServiceExtension`.
-- Restored notifications with targeted 32 MiB enforcement and proved the central memory-limit hypothesis.
-- Fixed 100 ms polling was effective but too expensive for long-term use.
-
-## [0.1.0] — 2026-07-11
-
-- Initial rootless injected-client and privileged-process architecture.
-- The privileged component started, but the client connection did not complete.
-- No memory-limit change reached the target.
-- Established the first experimental baseline for the investigation.
+Earlier public history remains available in [GitHub Releases](https://github.com/Allukardh/WAJetsamFix-Release/releases).
