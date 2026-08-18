@@ -1,0 +1,81 @@
+name: Add sponsor block to RootHide 0.8 release
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/v080-sponsor-block.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-release:
+    if: github.event.pull_request.head.ref == 'ops/v080-sponsor-block'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: Allukardh/WAJetsamFix-Release
+    steps:
+      - name: Copy sponsor block and verify release invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh api "repos/$REPO/releases/tags/v0.7.1" > /tmp/v071-before.json
+          gh api "repos/$REPO/releases/tags/v0.8.0" > /tmp/v080-before.json
+
+          test "$(jq -r '.draft' /tmp/v080-before.json)" = false
+          test "$(jq -r '.prerelease' /tmp/v080-before.json)" = false
+          test "$(jq '.assets | length' /tmp/v080-before.json)" -eq 1
+          test "$(jq -r '.assets[0].name' /tmp/v080-before.json)" = 'com.allukardh.wajetsamfix_0.8.0_iphoneos-arm64.deb'
+          test "$(gh api "repos/$REPO/releases/latest" --jq .tag_name)" = v0.8.0
+
+          jq -r '.body' /tmp/v071-before.json > /tmp/v071-body-before.md
+          jq -r '.body' /tmp/v080-before.json > /tmp/v080-body-before.md
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          old = Path("/tmp/v071-body-before.md").read_text()
+          current = Path("/tmp/v080-body-before.md").read_text()
+          marker = "---\n\n> 💙 WAJetsamFix is free and independently maintained."
+          start = old.rfind(marker)
+          if start < 0:
+              raise SystemExit("Sponsor block was not found in v0.7.1")
+          sponsor = old[start:].rstrip()
+          expected_link = "**[Support WAJetsamFix](https://github.com/sponsors/Allukardh)**"
+          if expected_link not in sponsor:
+              raise SystemExit("Sponsor link was not found in the v0.7.1 block")
+          if "Support WAJetsamFix" in current or "github.com/sponsors/Allukardh" in current:
+              raise SystemExit("v0.8.0 already contains a sponsor block")
+          separator = "" if current.endswith("\n\n") else ("\n" if current.endswith("\n") else "\n\n")
+          Path("/tmp/v080-body-expected.md").write_text(current + separator + sponsor + "\n")
+          PY
+
+          release_id="$(jq -r '.id' /tmp/v080-before.json)"
+          jq -n --rawfile body /tmp/v080-body-expected.md '{body: $body}' > /tmp/release-patch.json
+          gh api --method PATCH "repos/$REPO/releases/$release_id" --input /tmp/release-patch.json > /tmp/v080-patched.json
+
+          gh api "repos/$REPO/releases/tags/v0.8.0" > /tmp/v080-after.json
+          gh api "repos/$REPO/releases/tags/v0.7.1" > /tmp/v071-after.json
+
+          jq -r '.body' /tmp/v080-after.json > /tmp/v080-body-after.md
+          diff -u /tmp/v080-body-expected.md /tmp/v080-body-after.md
+          test "$(grep -Fc 'Support WAJetsamFix' /tmp/v080-body-after.md)" -eq 1
+          test "$(grep -Fc 'https://github.com/sponsors/Allukardh' /tmp/v080-body-after.md)" -eq 1
+
+          jq '{name,tag_name,target_commitish,draft,prerelease,assets:[.assets[]|{id,name,label,state,content_type,size}]}' /tmp/v080-before.json > /tmp/v080-invariants-before.json
+          jq '{name,tag_name,target_commitish,draft,prerelease,assets:[.assets[]|{id,name,label,state,content_type,size}]}' /tmp/v080-after.json > /tmp/v080-invariants-after.json
+          diff -u /tmp/v080-invariants-before.json /tmp/v080-invariants-after.json
+
+          test "$(jq -r '.body' /tmp/v071-before.json | sha256sum | cut -d' ' -f1)" = "$(jq -r '.body' /tmp/v071-after.json | sha256sum | cut -d' ' -f1)"
+          test "$(gh api "repos/$REPO/releases/latest" --jq .tag_name)" = v0.8.0
+
+      - name: Close operator pull request and remove temporary branch
+        if: always() && job.status == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh pr close "${{ github.event.pull_request.number }}" --repo "$REPO" --delete-branch --comment 'The sponsor block was copied from v0.7.1 to v0.8.0 and the Release invariants were verified. Temporary operator branch removed.'
