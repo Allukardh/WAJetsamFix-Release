@@ -1,0 +1,263 @@
+name: RootHide 0.8 public release operator
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/roothide-0.8-public-release.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  publish:
+    if: github.event.pull_request.head.ref == 'ops/roothide-0.8-public-release'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: Allukardh/WAJetsamFix-Release
+      MAIN_SHA: 860ef313969051b21cfaf983cc9a2041baf5ec18
+      ALPHA_TARGET: 2c060e759c7e14e8f87ea03c0259b6b14a284d85
+      ASSET_BLOB: 85aacd16111594f9d0673505389686a5c40afe51
+      ASSET_NAME: com.allukardh.wajetsamfix_0.8.0_iphoneos-arm64.deb
+      ASSET_SHA256: 6bb869201df4ab00c5fc5465f29c56fcd312ff213ae559167a5b963a64ec65ce
+    steps:
+      - name: Preflight public repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$REPO/commits/main" --jq .sha)" = "$MAIN_SHA"
+
+          gh api --paginate "repos/$REPO/releases?per_page=100" | jq -s 'add' > /tmp/releases-before.json
+          test "$(jq 'length' /tmp/releases-before.json)" -eq 16
+          test "$(jq '[.[].assets | length] | add' /tmp/releases-before.json)" -eq 1
+          test "$(gh api "repos/$REPO/releases/latest" --jq .tag_name)" = "v0.7.1"
+          test "$(jq '[.[] | select(.tag_name == "v0.7.1")] | length' /tmp/releases-before.json)" -eq 1
+          test "$(jq '[.[] | select(.tag_name == "v0.7.1")][0].assets | length' /tmp/releases-before.json)" -eq 1
+          test "$(jq '[.[] | select(.tag_name | startswith("v0.8.0"))] | length' /tmp/releases-before.json)" -eq 0
+
+          jq -r '[.[] | select(.tag_name == "v0.7.1")][0].body' /tmp/releases-before.json | sha256sum | cut -d' ' -f1 > /tmp/v071-body.sha256
+          jq -r '[.[] | select(.tag_name == "v0.7.1")][0].target_commitish' /tmp/releases-before.json > /tmp/v071-target.txt
+
+          if gh api "repos/$REPO/git/matching-refs/tags/v0.8.0" --jq 'length' | grep -qv '^0$'; then
+            echo "Unexpected pre-existing v0.8 tag" >&2
+            exit 1
+          fi
+
+      - name: Recover and verify final package
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$REPO/git/blobs/$ASSET_BLOB" --jq .content | tr -d '\n' | base64 -d > "/tmp/$ASSET_NAME"
+          echo "$ASSET_SHA256  /tmp/$ASSET_NAME" | sha256sum --check --strict
+          test "$(stat -c %s "/tmp/$ASSET_NAME")" -eq 62232
+
+      - name: Prepare curated public notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/notes
+
+          printf '%s\n' \
+            'Introduced the RootHide 0.8 settings foundation and the manual 48 MB, 72 MB and 96 MB profiles.' \
+            '' \
+            'Historical prerelease notes only. No package is attached.' \
+            > /tmp/notes/alpha1.md
+
+          printf '%s\n' \
+            'Corrected PreferenceLoader registration and restart signaling for the RootHide settings experience.' \
+            '' \
+            'Historical prerelease notes only. No package is attached.' \
+            > /tmp/notes/alpha1.1.md
+
+          printf '%s\n' \
+            'Corrected the settings container and panel presentation used by the RootHide edition.' \
+            '' \
+            'Historical prerelease notes only. No package is attached.' \
+            > /tmp/notes/alpha1.2.md
+
+          printf '%s\n' \
+            'Aligned post-configuration restart behavior with RootHide Userspace Reboot.' \
+            '' \
+            'Historical prerelease notes only. No package is attached.' \
+            > /tmp/notes/alpha1.3.md
+
+          printf '%s\n' \
+            'Introduced bounded calibration and the manual recommendation flow across the supported profiles.' \
+            '' \
+            'Calibration recommends a profile but does not apply it automatically.' \
+            '' \
+            'Historical prerelease notes only. No package is attached.' \
+            > /tmp/notes/alpha2.md
+
+          printf '%s\n' \
+            'Refined button state and user-facing descriptions without changing runtime behavior.' \
+            '' \
+            'Historical prerelease notes only. No package is attached.' \
+            > /tmp/notes/alpha2.1.md
+
+          printf '%s\n' \
+            'Stable public release of WAJetsamFix 0.8.0 for RootHide.' \
+            '' \
+            '**Highlights**' \
+            '' \
+            '- Manual 48 MB, 72 MB and 96 MB profiles.' \
+            '- Bounded calibration with manual-only recommendations.' \
+            '- Final PreferenceLoader panel, descriptions and WAJetsamFix icon.' \
+            '- RootHide Userspace Reboot integration.' \
+            '- Scoped operation: no global Jetsam override, background polling, automatic repair or silent profile application.' \
+            '' \
+            '**Installation**' \
+            '' \
+            'Process the downloaded package with RootHide Patcher, install the patched package through Sileo and perform a Userspace Reboot when requested.' \
+            '' \
+            '**Integrity**' \
+            '' \
+            '`com.allukardh.wajetsamfix_0.8.0_iphoneos-arm64.deb`' \
+            '' \
+            'SHA-256: `6bb869201df4ab00c5fc5465f29c56fcd312ff213ae559167a5b963a64ec65ce`' \
+            '' \
+            'This Release contains exactly one asset: the final RootHide `.deb`. The Dopamine edition remains a frozen private Alpha with no public package.' \
+            > /tmp/notes/final.md
+
+          if grep -R -n '^# ' /tmp/notes; then
+            echo "Release notes must not repeat release titles as H1 headings" >&2
+            exit 1
+          fi
+
+      - name: Create all releases as drafts
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create v0.8.0-alpha1 --repo "$REPO" --target "$ALPHA_TARGET" --title 'WAJetsamFix 0.8.0 Alpha 1' --notes-file /tmp/notes/alpha1.md --prerelease --draft
+          gh release create v0.8.0-alpha1.1 --repo "$REPO" --target "$ALPHA_TARGET" --title 'WAJetsamFix 0.8.0 Alpha 1.1' --notes-file /tmp/notes/alpha1.1.md --prerelease --draft
+          gh release create v0.8.0-alpha1.2 --repo "$REPO" --target "$ALPHA_TARGET" --title 'WAJetsamFix 0.8.0 Alpha 1.2' --notes-file /tmp/notes/alpha1.2.md --prerelease --draft
+          gh release create v0.8.0-alpha1.3 --repo "$REPO" --target "$ALPHA_TARGET" --title 'WAJetsamFix 0.8.0 Alpha 1.3' --notes-file /tmp/notes/alpha1.3.md --prerelease --draft
+          gh release create v0.8.0-alpha2 --repo "$REPO" --target "$ALPHA_TARGET" --title 'WAJetsamFix 0.8.0 Alpha 2' --notes-file /tmp/notes/alpha2.md --prerelease --draft
+          gh release create v0.8.0-alpha2.1 --repo "$REPO" --target "$ALPHA_TARGET" --title 'WAJetsamFix 0.8.0 Alpha 2.1' --notes-file /tmp/notes/alpha2.1.md --prerelease --draft
+          gh release create v0.8.0 "/tmp/$ASSET_NAME" --repo "$REPO" --target "$MAIN_SHA" --title 'WAJetsamFix 0.8.0' --notes-file /tmp/notes/final.md --draft
+
+      - name: Verify drafts before presentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --paginate "repos/$REPO/releases?per_page=100" | jq -s 'add' > /tmp/releases-draft.json
+          test "$(jq 'length' /tmp/releases-draft.json)" -eq 23
+
+          while IFS='|' read -r tag title; do
+            test "$(jq --arg t "$tag" '[.[] | select(.tag_name == $t)] | length' /tmp/releases-draft.json)" -eq 1
+            test "$(jq -r --arg t "$tag" '.[] | select(.tag_name == $t) | .name' /tmp/releases-draft.json)" = "$title"
+            test "$(jq -r --arg t "$tag" '.[] | select(.tag_name == $t) | .draft' /tmp/releases-draft.json)" = true
+            test "$(jq -r --arg t "$tag" '.[] | select(.tag_name == $t) | .prerelease' /tmp/releases-draft.json)" = true
+            test "$(jq --arg t "$tag" '.[] | select(.tag_name == $t) | .assets | length' /tmp/releases-draft.json)" -eq 0
+            if jq -r --arg t "$tag" '.[] | select(.tag_name == $t) | .body' /tmp/releases-draft.json | grep -q '^# '; then
+              echo "Duplicated title in $tag notes" >&2
+              exit 1
+            fi
+          done <<'EOF'
+          v0.8.0-alpha1|WAJetsamFix 0.8.0 Alpha 1
+          v0.8.0-alpha1.1|WAJetsamFix 0.8.0 Alpha 1.1
+          v0.8.0-alpha1.2|WAJetsamFix 0.8.0 Alpha 1.2
+          v0.8.0-alpha1.3|WAJetsamFix 0.8.0 Alpha 1.3
+          v0.8.0-alpha2|WAJetsamFix 0.8.0 Alpha 2
+          v0.8.0-alpha2.1|WAJetsamFix 0.8.0 Alpha 2.1
+          EOF
+
+          test "$(jq '[.[] | select(.tag_name == "v0.8.0")] | length' /tmp/releases-draft.json)" -eq 1
+          test "$(jq -r '.[] | select(.tag_name == "v0.8.0") | .name' /tmp/releases-draft.json)" = 'WAJetsamFix 0.8.0'
+          test "$(jq -r '.[] | select(.tag_name == "v0.8.0") | .draft' /tmp/releases-draft.json)" = true
+          test "$(jq -r '.[] | select(.tag_name == "v0.8.0") | .prerelease' /tmp/releases-draft.json)" = false
+          test "$(jq '.[] | select(.tag_name == "v0.8.0") | .assets | length' /tmp/releases-draft.json)" -eq 1
+          test "$(jq -r '.[] | select(.tag_name == "v0.8.0") | .assets[0].name' /tmp/releases-draft.json)" = "$ASSET_NAME"
+          if jq -r '.[] | select(.tag_name == "v0.8.0") | .body' /tmp/releases-draft.json | grep -q '^# '; then
+            echo "Duplicated title in final notes" >&2
+            exit 1
+          fi
+
+          asset_id="$(jq -r '.[] | select(.tag_name == "v0.8.0") | .assets[0].id' /tmp/releases-draft.json)"
+          gh api -H 'Accept: application/octet-stream' "repos/$REPO/releases/assets/$asset_id" > /tmp/draft-download.deb
+          echo "$ASSET_SHA256  /tmp/draft-download.deb" | sha256sum --check --strict
+
+      - name: Publish verified releases
+        shell: bash
+        run: |
+          set -euo pipefail
+          for tag in v0.8.0-alpha1 v0.8.0-alpha1.1 v0.8.0-alpha1.2 v0.8.0-alpha1.3 v0.8.0-alpha2 v0.8.0-alpha2.1; do
+            gh release edit "$tag" --repo "$REPO" --draft=false --prerelease
+          done
+          gh release edit v0.8.0 --repo "$REPO" --draft=false --latest
+
+      - name: Verify public package then retire obsolete 0.7.1 asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/public-download
+          gh release download v0.8.0 --repo "$REPO" --pattern "$ASSET_NAME" --dir /tmp/public-download
+          echo "$ASSET_SHA256  /tmp/public-download/$ASSET_NAME" | sha256sum --check --strict
+
+          gh api --paginate "repos/$REPO/releases?per_page=100" | jq -s 'add' > /tmp/releases-published.json
+          test "$(jq -r '.[] | select(.tag_name == "v0.8.0") | .draft' /tmp/releases-published.json)" = false
+          test "$(jq -r '.[] | select(.tag_name == "v0.8.0") | .prerelease' /tmp/releases-published.json)" = false
+          test "$(gh api "repos/$REPO/releases/latest" --jq .tag_name)" = v0.8.0
+
+          old_asset_id="$(jq -r '[.[] | select(.tag_name == "v0.7.1")][0].assets[0].id' /tmp/releases-published.json)"
+          test "$old_asset_id" != null
+          gh api --method DELETE "repos/$REPO/releases/assets/$old_asset_id"
+
+      - name: Final release audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$REPO/commits/main" --jq .sha)" = "$MAIN_SHA"
+          gh api --paginate "repos/$REPO/releases?per_page=100" | jq -s 'add' > /tmp/releases-final.json
+
+          test "$(jq 'length' /tmp/releases-final.json)" -eq 23
+          test "$(jq '[.[].assets | length] | add' /tmp/releases-final.json)" -eq 1
+          test "$(gh api "repos/$REPO/releases/latest" --jq .tag_name)" = v0.8.0
+          test "$(jq '.[] | select(.tag_name == "v0.7.1") | .assets | length' /tmp/releases-final.json)" -eq 0
+          test "$(jq '[.[] | select((.tag_name | ascii_downcase | contains("rc")) and (.tag_name | startswith("v0.8.0")))] | length' /tmp/releases-final.json)" -eq 0
+          test "$(jq '[.[] | select((.tag_name | ascii_downcase | contains("dopamine")) or ([.assets[].name | ascii_downcase | contains("dopamine")] | any))] | length' /tmp/releases-final.json)" -eq 0
+
+          for tag in v0.8.0-alpha1 v0.8.0-alpha1.1 v0.8.0-alpha1.2 v0.8.0-alpha1.3 v0.8.0-alpha2 v0.8.0-alpha2.1; do
+            test "$(jq -r --arg t "$tag" '.[] | select(.tag_name == $t) | .draft' /tmp/releases-final.json)" = false
+            test "$(jq -r --arg t "$tag" '.[] | select(.tag_name == $t) | .prerelease' /tmp/releases-final.json)" = true
+            test "$(jq --arg t "$tag" '.[] | select(.tag_name == $t) | .assets | length' /tmp/releases-final.json)" -eq 0
+          done
+
+          test "$(jq '.[] | select(.tag_name == "v0.8.0") | .assets | length' /tmp/releases-final.json)" -eq 1
+          test "$(jq -r '.[] | select(.tag_name == "v0.8.0") | .assets[0].name' /tmp/releases-final.json)" = "$ASSET_NAME"
+          test "$(gh api "repos/$REPO/git/ref/tags/v0.8.0" --jq .object.sha)" = "$MAIN_SHA"
+          for tag in v0.8.0-alpha1 v0.8.0-alpha1.1 v0.8.0-alpha1.2 v0.8.0-alpha1.3 v0.8.0-alpha2 v0.8.0-alpha2.1; do
+            test "$(gh api "repos/$REPO/git/ref/tags/$tag" --jq .object.sha)" = "$ALPHA_TARGET"
+          done
+
+          jq -r '.[] | select(.tag_name == "v0.7.1") | .body' /tmp/releases-final.json | sha256sum | cut -d' ' -f1 > /tmp/v071-body-final.sha256
+          diff -u /tmp/v071-body.sha256 /tmp/v071-body-final.sha256
+          test "$(jq -r '.[] | select(.tag_name == "v0.7.1") | .target_commitish' /tmp/releases-final.json)" = "$(cat /tmp/v071-target.txt)"
+
+          mkdir -p release-audit
+          printf '%s\n' \
+            "main_sha=$MAIN_SHA" \
+            "final_tag=v0.8.0" \
+            "final_asset=$ASSET_NAME" \
+            "sha256=$ASSET_SHA256" \
+            "release_count=$(jq 'length' /tmp/releases-final.json)" \
+            "asset_count=$(jq '[.[].assets | length] | add' /tmp/releases-final.json)" \
+            "latest=$(gh api "repos/$REPO/releases/latest" --jq .tag_name)" \
+            > release-audit/summary.txt
+
+      - name: Upload audit summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: roothide-0.8-public-release-audit
+          path: release-audit/summary.txt
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Clean temporary branches and close operator PR
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method DELETE "repos/$REPO/git/refs/heads/agent/roothide-0.8-public-release"
+          gh pr close "${{ github.event.pull_request.number }}" --repo "$REPO" --delete-branch --comment 'Public RootHide 0.8 release completed and verified; temporary operator branch removed.'
