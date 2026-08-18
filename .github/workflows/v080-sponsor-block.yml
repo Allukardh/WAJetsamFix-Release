@@ -32,8 +32,8 @@ jobs:
           test "$(jq -r '.assets[0].name' /tmp/v080-before.json)" = 'com.allukardh.wajetsamfix_0.8.0_iphoneos-arm64.deb'
           test "$(gh api "repos/$REPO/releases/latest" --jq .tag_name)" = v0.8.0
 
-          jq -r '.body' /tmp/v071-before.json > /tmp/v071-body-before.md
-          jq -r '.body' /tmp/v080-before.json > /tmp/v080-body-before.md
+          jq -r '.body | @base64' /tmp/v071-before.json | base64 -d > /tmp/v071-body-before.md
+          jq -r '.body | @base64' /tmp/v080-before.json | base64 -d > /tmp/v080-body-before.md
 
           python3 - <<'PY'
           from pathlib import Path
@@ -48,19 +48,25 @@ jobs:
           if "Support WAJetsamFix" not in sponsor or "https://github.com/sponsors/Allukardh" not in sponsor:
               raise SystemExit("Sponsor link was not found in the v0.7.1 block")
           if "Support WAJetsamFix" in current or "github.com/sponsors/Allukardh" in current:
-              raise SystemExit("v0.8.0 already contains a sponsor block")
-          separator = "" if current.endswith("\n\n") else ("\n" if current.endswith("\n") else "\n\n")
-          Path("/tmp/v080-body-expected.md").write_text(current + separator + sponsor + "\n")
+              if not current.rstrip().endswith(sponsor):
+                  raise SystemExit("Existing v0.8.0 sponsor content does not exactly match v0.7.1")
+              Path("/tmp/v080-body-expected.md").write_text(current)
+              Path("/tmp/sponsor-already-present").touch()
+          else:
+              separator = "" if current.endswith("\n\n") else ("\n" if current.endswith("\n") else "\n\n")
+              Path("/tmp/v080-body-expected.md").write_text(current + separator + sponsor + "\n")
           PY
 
-          release_id="$(jq -r '.id' /tmp/v080-before.json)"
-          jq -n --rawfile body /tmp/v080-body-expected.md '{body: $body}' > /tmp/release-patch.json
-          gh api --method PATCH "repos/$REPO/releases/$release_id" --input /tmp/release-patch.json > /tmp/v080-patched.json
+          if [[ ! -e /tmp/sponsor-already-present ]]; then
+            release_id="$(jq -r '.id' /tmp/v080-before.json)"
+            jq -n --rawfile body /tmp/v080-body-expected.md '{body: $body}' > /tmp/release-patch.json
+            gh api --method PATCH "repos/$REPO/releases/$release_id" --input /tmp/release-patch.json > /tmp/v080-patched.json
+          fi
 
           gh api "repos/$REPO/releases/tags/v0.8.0" > /tmp/v080-after.json
           gh api "repos/$REPO/releases/tags/v0.7.1" > /tmp/v071-after.json
 
-          jq -r '.body' /tmp/v080-after.json > /tmp/v080-body-after.md
+          jq -r '.body | @base64' /tmp/v080-after.json | base64 -d > /tmp/v080-body-after.md
           diff -u /tmp/v080-body-expected.md /tmp/v080-body-after.md
           test "$(grep -Fc 'Support WAJetsamFix' /tmp/v080-body-after.md)" -eq 1
           test "$(grep -Fc 'https://github.com/sponsors/Allukardh' /tmp/v080-body-after.md)" -eq 1
