@@ -1,1 +1,1 @@
-17670a96b751ef7f94979e399774931b53511b53c4687b1a5d6d48ab7d7ac115  com.allukardh.wajetsamfix_0.7.1_iphoneos-arm64.deb
+6bb869201df4ab00c5fc5465f29c56fcd312ff213ae559167a5b963a64ec65ce  com.allukardh.wajetsamfix_0.8.0_iphoneos-arm64.deb
